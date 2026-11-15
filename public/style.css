@@ -29,6 +29,7 @@
   .tab-content {
     display: block !important;
     page-break-after: auto;
+    animation: none !important;
   }
 
   .card-item {
@@ -38,6 +39,8 @@
     box-shadow: none !important;
     background: #ffffff !important;
     color: #000000 !important;
+    transform: none !important;
+    animation: none !important;
   }
 
   .card-item * {
@@ -51,7 +54,6 @@
     color: #000000 !important;
   }
 
-  /* Sitter input styling for physical binder print */
   input, textarea {
     border: 1px solid #cbd5e1 !important;
     background: transparent !important;
@@ -62,8 +64,8 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -73,6 +75,7 @@
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 9999px;
+  transition: background 0.2s ease;
 }
 
 .dark ::-webkit-scrollbar-thumb {
@@ -87,15 +90,17 @@
   background: #475569;
 }
 
-/* Animations */
+/* ================= SIMPLE & DELIGHTFUL ANIMATIONS ================= */
+
+/* Tab Content Slide In */
 .tab-content {
-  animation: popIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: tabFadeSlide 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes popIn {
+@keyframes tabFadeSlide {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -103,17 +108,112 @@
   }
 }
 
-@keyframes scaleUp {
+/* Card Entrance Stagger */
+.card-item {
+  animation: cardEntrance 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
+}
+
+.card-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+.dark .card-item:hover {
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes cardEntrance {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: translateY(10px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Hero Highlight Tiles Lift */
+.hero-tile {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
+}
+
+.hero-tile:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.06);
+}
+
+.dark .hero-tile:hover {
+  box-shadow: 0 8px 22px -4px rgba(0, 0, 0, 0.4);
+}
+
+/* Theme Toggle Button Micro-Interaction */
+#themeToggleBtn {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+}
+
+#themeToggleBtn #themeToggleIcon {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#themeToggleBtn:hover #themeToggleIcon {
+  transform: rotate(24deg) scale(1.18);
+}
+
+#themeToggleBtn:active #themeToggleIcon {
+  transform: rotate(90deg) scale(0.85);
+}
+
+/* Modal Smooth Spring In */
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
 .animate-scaleUp {
-  animation: scaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Subtle Pulse for Live Verified Status */
+@keyframes gentlePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.75;
+  }
+}
+
+.pulse-beacon {
+  animation: gentlePulse 2.4s infinite ease-in-out;
+}
+
+/* Interactive Button Tactile Bounce */
+button, .tab-chip {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:active, .tab-chip:active {
+  transform: scale(0.97);
+}
+
+/* Toast Enhanced Ease */
+#toast {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s ease;
 }

@@ -1,4 +1,4 @@
-// Ark Vault • Digital Edition • Clean Slate LocalStorage Engine with Dark Mode
+// Ark Vault • Digital Edition • Clean Slate LocalStorage Engine with Dark Mode & Enhanced Typography
 
 const STORAGE_KEY = 'ark_vault_data_clean_v3';
 const THEME_KEY = 'ark_theme';
@@ -270,11 +270,12 @@ function getBadgeColors(cat) {
   }
 }
 
-// Create dynamic card element
-function createCardElement(cat, item) {
+// Create dynamic card element with enhanced typography & animations
+function createCardElement(cat, item, index = 0) {
   const colors = getBadgeColors(cat);
   const card = document.createElement('div');
-  card.className = 'card-item bg-white dark:bg-[#101726] rounded-2xl border border-slate-200 dark:border-slate-800/90 p-4 shadow-sm hover:shadow-md dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-3';
+  card.className = 'card-item bg-white dark:bg-[#101726] rounded-2xl border border-slate-200 dark:border-slate-800/90 p-5 shadow-sm hover:shadow-md dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-3.5';
+  card.style.animationDelay = `${index * 0.05}s`;
   card.dataset.id = item.id;
   card.dataset.cat = cat;
 
@@ -285,25 +286,25 @@ function createCardElement(cat, item) {
 
   card.innerHTML = `
     <div>
-      <div class="flex items-center justify-between mb-2">
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${colors.bg} ${colors.text} border ${colors.border} font-mono uppercase tracking-wider">
+      <div class="flex items-center justify-between mb-2.5">
+        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${colors.bg} ${colors.text} border ${colors.border} font-mono uppercase tracking-wider">
           ${escapeHtml(item.badge || 'LIFELINE')}
         </span>
-        <button class="toggle-verify-btn text-xs font-bold ${item.verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} hover:opacity-80 transition-all flex items-center gap-1 font-display" title="Toggle verification status">
+        <button class="toggle-verify-btn text-sm font-bold ${item.verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} hover:opacity-80 transition-all flex items-center gap-1.5 font-display" title="Toggle verification status">
           ${item.verified ? '✓ VERIFIED' : '⚪ UNVERIFIED'}
         </button>
       </div>
-      <h3 class="text-sm font-black text-slate-900 dark:text-white font-display">${escapeHtml(item.title)}</h3>
-      <p class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(item.ref || 'No identifier')}</p>
-      <div class="mt-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs text-slate-700 dark:text-slate-300 space-y-1 font-sans">
+      <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display leading-snug">${escapeHtml(item.title)}</h3>
+      <p class="text-xs md:text-sm font-mono font-medium text-slate-500 dark:text-slate-400 mt-1">${escapeHtml(item.ref || 'No identifier recorded')}</p>
+      <div class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs md:text-sm text-slate-700 dark:text-slate-300 space-y-1.5 font-sans leading-relaxed">
         ${notesHtml}
       </div>
     </div>
-    <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between no-print">
-      <button class="edit-btn text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-display">
+    <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between no-print">
+      <button class="edit-btn text-xs md:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-display active:scale-95 transition-transform">
         ✏️ Edit
       </button>
-      <button class="delete-btn text-[11px] font-bold text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-display">
+      <button class="delete-btn text-xs md:text-sm font-bold text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-display active:scale-95 transition-transform">
         🗑️ Delete
       </button>
     </div>
@@ -346,14 +347,14 @@ function renderAll() {
 
     if (items.length === 0) {
       const emptyDiv = document.createElement('div');
-      emptyDiv.className = 'col-span-full p-8 text-center bg-white/80 dark:bg-slate-900/60 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl space-y-3 transition-colors';
+      emptyDiv.className = 'col-span-full p-8 md:p-10 text-center bg-white/80 dark:bg-slate-900/60 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl space-y-3.5 transition-colors';
       emptyDiv.innerHTML = `
-        <div class="text-3xl">${cfg.icon}</div>
+        <div class="text-4xl transform hover:scale-110 transition-transform duration-200">${cfg.icon}</div>
         <div>
-          <h4 class="text-sm font-black text-slate-800 dark:text-slate-200 font-display">${cfg.title}</h4>
-          <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">${cfg.desc}</p>
+          <h4 class="text-base md:text-lg font-black text-slate-800 dark:text-slate-200 font-display">${cfg.title}</h4>
+          <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1.5 leading-relaxed">${cfg.desc}</p>
         </div>
-        <button class="add-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition-all ${cfg.btnColor} font-display">
+        <button class="add-cat-btn px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${cfg.btnColor} font-display active:scale-95 shadow-sm">
           ➕ Add First ${cfg.badge}
         </button>
       `;
@@ -362,8 +363,8 @@ function renderAll() {
       });
       container.appendChild(emptyDiv);
     } else {
-      items.forEach(item => {
-        container.appendChild(createCardElement(cat, item));
+      items.forEach((item, idx) => {
+        container.appendChild(createCardElement(cat, item, idx));
       });
     }
   });
@@ -500,6 +501,11 @@ document.getElementById('addCardBtn').addEventListener('click', () => openAddMod
 document.getElementById('closeModal').addEventListener('click', closeRecordModal);
 document.getElementById('cancelModal').addEventListener('click', closeRecordModal);
 
+// Close modal on backdrop click
+recordModal.addEventListener('click', (e) => {
+  if (e.target === recordModal) closeRecordModal();
+});
+
 deleteRecordModalBtn.addEventListener('click', () => {
   const cat = cardCat.value;
   const id = editRecordId.value;
@@ -553,7 +559,7 @@ document.getElementById('saveCardBtn').addEventListener('click', () => {
   document.querySelector(`[data-tab="${cat}"]`)?.click();
 });
 
-// Tab Switching
+// Tab Switching & Clickable Hero Tiles
 const tabChips = document.querySelectorAll('.tab-chip');
 const tabPanels = {
   urgent: document.getElementById('tab-urgent'),
@@ -571,27 +577,42 @@ const chipColorMap = {
   sitter: { bg: 'bg-emerald-600', text: 'text-white', shadow: 'shadow-emerald-600/20' }
 };
 
-tabChips.forEach(chip => {
-  chip.addEventListener('click', () => {
-    const target = chip.dataset.tab;
-    if (!target || !tabPanels[target]) return;
+function switchTab(target) {
+  if (!target || !tabPanels[target]) return;
 
-    sound.pop(480);
+  sound.pop(480);
 
-    tabChips.forEach(c => {
-      c.className = 'tab-chip px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display';
-    });
+  tabChips.forEach(c => {
+    c.className = 'tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display';
+  });
 
+  const activeBtn = document.querySelector(`.tab-chip[data-tab="${target}"]`);
+  if (activeBtn) {
     const color = chipColorMap[target] || chipColorMap.urgent;
-    chip.className = `tab-chip px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 ${color.bg} ${color.text} shadow-md ${color.shadow} whitespace-nowrap transition-all font-display`;
+    activeBtn.className = `tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 ${color.bg} ${color.text} shadow-md ${color.shadow} whitespace-nowrap transition-all font-display`;
+  }
 
-    Object.keys(tabPanels).forEach(k => {
-      if (k === target) {
-        tabPanels[k].classList.remove('hidden');
-      } else {
-        tabPanels[k].classList.add('hidden');
-      }
-    });
+  Object.keys(tabPanels).forEach(k => {
+    if (k === target) {
+      tabPanels[k].classList.remove('hidden');
+    } else {
+      tabPanels[k].classList.add('hidden');
+    }
+  });
+}
+
+tabChips.forEach(chip => {
+  chip.addEventListener('click', () => switchTab(chip.dataset.tab));
+});
+
+// Clickable Hero Tiles navigate directly to tabs
+document.querySelectorAll('[data-nav-tab]').forEach(tile => {
+  tile.addEventListener('click', () => {
+    const target = tile.dataset.navTab;
+    if (target) {
+      switchTab(target);
+      window.scrollTo({ top: 320, behavior: 'smooth' });
+    }
   });
 });
 
@@ -599,7 +620,7 @@ tabChips.forEach(chip => {
 const saveSitterBtn = document.getElementById('saveSitterBtn');
 const copySitterAction = document.getElementById('copySitterAction');
 
-saveSitterBtn.addEventListener('click', () => {
+function syncSitterFromInputs() {
   vaultState.sitter = {
     kids: document.getElementById('sitterKidsInput').value.trim(),
     allergies: document.getElementById('sitterAllergiesInput').value.trim(),
@@ -607,19 +628,15 @@ saveSitterBtn.addEventListener('click', () => {
     house: document.getElementById('sitterHouseInput').value.trim()
   };
   saveState();
+}
+
+saveSitterBtn.addEventListener('click', () => {
+  syncSitterFromInputs();
   showToast("Babysitter briefing saved! 👶");
 });
 
 copySitterAction.addEventListener('click', () => {
-  // Sync latest inputs into state before copying
-  vaultState.sitter = {
-    kids: document.getElementById('sitterKidsInput').value.trim(),
-    allergies: document.getElementById('sitterAllergiesInput').value.trim(),
-    contacts: document.getElementById('sitterContactsInput').value.trim(),
-    house: document.getElementById('sitterHouseInput').value.trim()
-  };
-  saveState();
-
+  syncSitterFromInputs();
   const s = vaultState.sitter || {};
   const kids = s.kids || "Children";
   const allergies = s.allergies || "None recorded.";
@@ -660,6 +677,9 @@ editFamilyBtn.addEventListener('click', () => {
 });
 
 cancelFamilyBtn.addEventListener('click', () => familyNameModal.classList.add('hidden'));
+familyNameModal.addEventListener('click', (e) => {
+  if (e.target === familyNameModal) familyNameModal.classList.add('hidden');
+});
 
 saveFamilyBtn.addEventListener('click', () => {
   const val = familyNameInput.value.trim();
@@ -687,6 +707,9 @@ backupBtn.addEventListener('click', () => {
 });
 closeBackupModal.addEventListener('click', () => backupModal.classList.add('hidden'));
 doneBackupBtn.addEventListener('click', () => backupModal.classList.add('hidden'));
+backupModal.addEventListener('click', (e) => {
+  if (e.target === backupModal) backupModal.classList.add('hidden');
+});
 
 // Export JSON
 downloadBackupBtn.addEventListener('click', () => {
@@ -745,6 +768,9 @@ templateMenuBtn.addEventListener('click', () => {
 });
 closeTemplateModal.addEventListener('click', () => templateModal.classList.add('hidden'));
 cancelTemplateBtn.addEventListener('click', () => templateModal.classList.add('hidden'));
+templateModal.addEventListener('click', (e) => {
+  if (e.target === templateModal) templateModal.classList.add('hidden');
+});
 
 clearToBlankBtn.addEventListener('click', () => {
   if (confirm("Clear all cards and reset to clean blank state?")) {
@@ -766,26 +792,36 @@ loadSampleDataBtn.addEventListener('click', () => {
   }
 });
 
-// Print Binder
-document.getElementById('printBtn').addEventListener('click', () => {
-  showToast('Preparing physical safe binder...');
+// Universal Keyboard listener (Escape closes modals)
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    recordModal.classList.add('hidden');
+    familyNameModal.classList.add('hidden');
+    backupModal.classList.add('hidden');
+    templateModal.classList.add('hidden');
+  }
+});
+
+// Print Binder Handling
+function preparePrint() {
   document.getElementById('printDateSpan').innerText = new Date().toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
+}
+
+document.getElementById('printBtn').addEventListener('click', () => {
+  showToast('Preparing physical safe binder...');
+  preparePrint();
   setTimeout(() => {
     window.print();
   }, 250);
 });
 
-// Ensure print layout de-darkens to pure black-on-white regardless of active theme
+// Hardened Print Hooks to prevent dark ink waste
 window.addEventListener('beforeprint', () => {
-  document.getElementById('printDateSpan').innerText = new Date().toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  preparePrint();
   document.documentElement.classList.remove('dark');
 });
 
@@ -795,33 +831,6 @@ window.addEventListener('afterprint', () => {
   if (saved === 'dark' || (!saved && systemDark)) {
     document.documentElement.classList.add('dark');
   }
-});
-
-// Modal Accessibility: Close modals on Escape key
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeRecordModal();
-    familyNameModal.classList.add('hidden');
-    backupModal.classList.add('hidden');
-    templateModal.classList.add('hidden');
-  }
-});
-
-// Close modals when clicking the dim backdrop
-[recordModal, familyNameModal, backupModal, templateModal].forEach(modal => {
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.add('hidden');
-    }
-  });
-});
-
-// Interactive Hero Tile navigation
-document.querySelectorAll('[data-nav-tab]').forEach(tile => {
-  tile.addEventListener('click', () => {
-    const tabName = tile.dataset.navTab;
-    document.querySelector(`[data-tab="${tabName}"]`)?.click();
-  });
 });
 
 // Initial boot
