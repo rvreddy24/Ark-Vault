@@ -1,531 +1,537 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ark Vault • Private Family Continuity OS</title>
-
-  <!-- SVG Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
-
-  <!-- Google Fonts: Inter (Body/UI) + Outfit (Headings) + JetBrains Mono (Numbers/Keys) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CSS & Custom Config -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            display: ['Outfit', 'Inter', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          }
-        }
-      }
-    };
-  </script>
-
-  <!-- Immediate Theme Initializer (Prevents FOUC) -->
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('ark_theme');
-      const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    })();
-  </script>
-
-  <link rel="stylesheet" href="style.css">
-  <style>
-    @media print {
-      .no-print { display: none !important; }
-      .print-only { display: block !important; }
-      html, body, .dark, body.dark, html.dark { background: white !important; color: #000 !important; font-size: 11pt; }
-      .tab-content { display: block !important; page-break-after: auto; }
-      .card-item { break-inside: avoid; border: 1px solid #cbd5e1 !important; box-shadow: none !important; color: #000 !important; background: #fff !important; }
-    }
-    .print-only { display: none; }
-  </style>
-</head>
-<body class="bg-[#f8fafc] text-slate-900 dark:bg-[#090d16] dark:text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white antialiased transition-colors duration-200 text-sm md:text-[15px] overflow-x-hidden">
-
-  <!-- ================= TOP NAVIGATION ================= -->
-  <header class="w-full bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-sm transition-colors duration-200 no-print">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 min-w-0">
-      
-      <!-- Brand & Editable Family Name -->
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-indigo-600/20 shrink-0 transform hover:scale-105 transition-transform duration-200">
-          🛡️
-        </div>
-        <div class="min-w-0">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="text-base sm:text-lg md:text-xl font-black tracking-tight text-slate-900 dark:text-white font-display shrink-0">Ark Vault</span>
-            <button id="editFamilyBtn" type="button" title="Click to edit Family Name" class="group flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-all hover:scale-[1.02] active:scale-95 min-w-0 max-w-[140px] sm:max-w-xs">
-              <span id="familyNameDisplay" class="truncate block">My Family Vault</span>
-              <span class="text-xs opacity-60 group-hover:opacity-100 shrink-0">✏️</span>
-            </button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta
+      name="description"
+      content="A private, offline workspace for a household handover your family can use."
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Ark — Your family, in good hands</title>
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="core.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="app-shell no-print">
+      <aside class="sidebar" aria-label="Workspace navigation">
+        <a class="brand" href="#overview" aria-label="Ark home"
+          ><span class="brand-mark" aria-hidden="true">a<span>↗</span></span
+          ><span>ark<span class="brand-dot">.</span></span></a
+        >
+        <div class="workspace-label">YOUR HOUSEHOLD WORKSPACE</div>
+        <button
+          class="household-switch"
+          id="profileBtn"
+          aria-label="Edit household and handover plan"
+          aria-haspopup="dialog"
+          aria-controls="profileDialog"
+        >
+          <span class="avatar" aria-hidden="true">⌂</span
+          ><span
+            ><strong id="householdName">My household</strong
+            ><small>Personal workspace ↗</small></span
+          >
+        </button>
+        <nav id="navigation" aria-label="Sections"></nav>
+        <div class="sidebar-bottom">
+          <div class="local-status">
+            <span class="status-dot"></span>On your device. In your control.
           </div>
-          <div class="flex items-center gap-2 text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 truncate">
-            <span class="hidden sm:inline shrink-0">Offline Client Vault</span>
-            <span class="hidden sm:inline text-slate-300 dark:text-slate-600 shrink-0">•</span>
-            <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5 shrink-0">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon inline-block shrink-0"></span>
-              100% Private (No Cloud)
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons (Responsive & Overflow-Safe) -->
-      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        <!-- Dark Mode Toggle Button -->
-        <button id="themeToggleBtn" type="button" class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm active:scale-95 shrink-0" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
-          <span id="themeToggleIcon" class="text-sm sm:text-base">🌙</span>
-        </button>
-
-        <!-- Data Backup Menu -->
-        <button id="backupBtn" type="button" class="h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm active:scale-95 shrink-0" title="Save or restore offline backup">
-          <span>💾</span>
-          <span class="hidden md:inline">Backup</span>
-        </button>
-
-        <!-- Print Binder -->
-        <button id="printBtn" type="button" class="h-9 sm:h-10 px-2.5 sm:px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm active:scale-95 shrink-0">
-          <span>🖨️</span>
-          <span class="hidden lg:inline">Print Safe Binder</span>
-          <span class="hidden sm:inline lg:hidden">Print</span>
-        </button>
-
-        <!-- Add Record -->
-        <button id="addCardBtn" type="button" class="h-9 sm:h-10 px-3 sm:px-4.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold transition-all shadow-md shadow-indigo-600/25 flex items-center gap-1.5 sm:gap-2 shrink-0 active:scale-95 font-display">
-          <span>➕</span>
-          <span class="hidden sm:inline">Add Record</span>
-          <span class="sm:hidden">Add</span>
-        </button>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- ================= PRINT COVER HEADER (PRINT ONLY) ================= -->
-  <div class="print-only max-w-5xl mx-auto p-6 mb-6 border-b-2 border-slate-900">
-    <div class="flex justify-between items-start">
-      <div>
-        <h1 class="text-3xl font-black text-slate-900 tracking-tight font-display">FAMILY EMERGENCY & CONTINUITY BINDER</h1>
-        <p class="text-xl font-bold text-slate-700 mt-1" id="printFamilyTitle">My Family Vault</p>
-        <p class="text-sm text-slate-500 font-mono mt-0.5">Generated for Home Fireproof Safe & Physical Next-of-Kin Access</p>
-      </div>
-      <div class="text-right text-sm font-mono">
-        <p class="font-bold text-slate-900">CONFIDENTIAL & SENSITIVE</p>
-        <p class="text-slate-500">Date Printed: <span id="printDateSpan"></span></p>
-        <p class="text-emerald-700 font-bold mt-1">STATUS: VERIFIED LIFELINES</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= MAIN CONTENT ================= -->
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8 space-y-7 min-w-0">
-
-    <!-- ================= 3-SECOND SNAPSHOT HERO ================= -->
-    <section class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200/90 dark:border-slate-800 p-5 sm:p-6 md:p-8 shadow-sm transition-colors duration-200 no-print min-w-0">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-6 border-b border-slate-100 dark:border-slate-800/80 min-w-0">
-        <div class="min-w-0 flex-1">
-          <div class="flex items-center gap-2.5">
-            <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider font-mono">⚡ Instant Family Status</span>
-            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Clean Slate</span>
-          </div>
-          <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight mt-1.5 font-display break-words" id="heroHeadline">
-            If Something Happens Tomorrow: You're <span id="scoreHeadlineSpan">0%</span> Ready
-          </h1>
-          <p class="text-xs sm:text-sm md:text-base text-slate-500 dark:text-slate-400 mt-1.5 max-w-2xl leading-relaxed break-words" id="heroSubtitle">
-            Your vault is completely private and saved in your local browser storage. Start by adding your first lifeline.
+          <p>
+            No account. No cloud sync.<br />Your browser copy is not encrypted.
           </p>
-        </div>
-
-        <!-- Big Visual Gauge (Dynamic border & text color) -->
-        <div id="scoreGaugeBox" class="flex items-center gap-3.5 sm:gap-4 bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 px-4 sm:px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300 self-start md:self-auto">
-          <div class="text-3xl sm:text-4xl md:text-5xl font-black font-mono tracking-tight text-slate-400 dark:text-slate-500 transition-colors" id="scoreReadout">0%</div>
-          <div class="min-w-0">
-            <span class="font-bold text-slate-900 dark:text-slate-100 block font-display text-xs sm:text-sm md:text-base truncate" id="scoreStatusLabel">⚪ Status: Clean Slate</span>
-            <span class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs md:text-sm block truncate" id="scoreDetailsLabel">0 Lifelines Added</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4 Scannable Highlight Tiles (Clickable Shortcuts with Overflow Guardrails) -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-3.5 pt-5 sm:pt-6">
-        
-        <div data-nav-tab="urgent" class="hero-tile p-3 sm:p-4 rounded-2xl bg-rose-50/80 dark:bg-rose-950/25 border border-rose-100 dark:border-rose-900/50 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-w-0 overflow-hidden">
-          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl sm:text-2xl shadow-sm shrink-0">
-            🚨
-          </div>
-          <div class="min-w-0 flex-1 overflow-hidden">
-            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 block font-mono truncate">Hours 0–24</span>
-            <span class="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white block font-display truncate" id="tileUrgentCount">0 Actions</span>
-            <span class="text-[11px] sm:text-xs font-semibold text-rose-600 dark:text-rose-400 block truncate" id="tileUrgentSub">Immediate Priority</span>
-          </div>
-        </div>
-
-        <div data-nav-tab="finance" class="hero-tile p-3 sm:p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/25 border border-blue-100 dark:border-blue-900/50 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-w-0 overflow-hidden">
-          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl sm:text-2xl shadow-sm shrink-0">
-            💰
-          </div>
-          <div class="min-w-0 flex-1 overflow-hidden">
-            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 block font-mono truncate">Money & Policies</span>
-            <span class="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white block font-display truncate" id="tileFinanceCount">0 Accounts</span>
-            <span class="text-[11px] sm:text-xs font-semibold text-blue-600 dark:text-blue-400 block truncate" id="tileFinanceSub">Policies & Banking</span>
-          </div>
-        </div>
-
-        <div data-nav-tab="home" class="hero-tile p-3 sm:p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/25 border border-amber-100 dark:border-amber-900/50 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-w-0 overflow-hidden">
-          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl sm:text-2xl shadow-sm shrink-0">
-            🚰
-          </div>
-          <div class="min-w-0 flex-1 overflow-hidden">
-            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 block font-mono truncate">Home & Shutoffs</span>
-            <span class="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white block font-display truncate" id="tileHomeCount">0 Specs</span>
-            <span class="text-[11px] sm:text-xs font-semibold text-amber-600 dark:text-amber-400 block truncate" id="tileHomeSub">Valves & Breakers</span>
-          </div>
-        </div>
-
-        <div data-nav-tab="parents" class="hero-tile p-3 sm:p-4 rounded-2xl bg-purple-50/80 dark:bg-purple-950/25 border border-purple-100 dark:border-purple-900/50 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-w-0 overflow-hidden">
-          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl sm:text-2xl shadow-sm shrink-0">
-            👵
-          </div>
-          <div class="min-w-0 flex-1 overflow-hidden">
-            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400 block font-mono truncate">Aging Parents</span>
-            <span class="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white block font-display truncate" id="tileParentsCount">0 Records</span>
-            <span class="text-[11px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400 block truncate" id="tileParentsSub">Care & Protection</span>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ================= COLORFUL INTERACTIVE TABS (min-w-0 Flex Child Prevents Overflow) ================= -->
-    <div class="flex items-center justify-between gap-3 no-print min-w-0 w-full">
-      <div class="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-1.5 scrollbar-none flex-1 min-w-0">
-        <button data-tab="urgent" type="button" class="tab-chip active px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-rose-600 text-white shadow-md shadow-rose-600/20 whitespace-nowrap transition-all font-display shrink-0">
-          <span class="text-base">🚨</span>
-          <span>1. First 24 Hours</span>
-        </button>
-
-        <button data-tab="finance" type="button" class="tab-chip px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display shrink-0">
-          <span class="text-base">💳</span>
-          <span>2. Money & Insurance</span>
-        </button>
-
-        <button data-tab="home" type="button" class="tab-chip px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display shrink-0">
-          <span class="text-base">🏡</span>
-          <span>3. Home & Shutoffs</span>
-        </button>
-
-        <button data-tab="parents" type="button" class="tab-chip px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display shrink-0">
-          <span class="text-base">👵</span>
-          <span>4. Aging Parents Hub</span>
-        </button>
-
-        <button data-tab="sitter" type="button" class="tab-chip px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display shrink-0">
-          <span class="text-base">👶</span>
-          <span>5. Sitter Pass (SMS)</span>
-        </button>
-      </div>
-
-      <!-- Quick Template Options Toggle -->
-      <button id="templateMenuBtn" type="button" class="shrink-0 text-xs sm:text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5 sm:gap-2" title="Reset or load sample data">
-        <span>⚙️</span>
-        <span class="hidden sm:inline">Options</span>
-      </button>
-    </div>
-
-    <!-- ================= TAB PANELS ================= -->
-
-    <!-- TAB 1: FIRST 24 HOURS (URGENT) -->
-    <section id="tab-urgent" class="tab-content space-y-4 min-w-0">
-      <div class="flex items-center justify-between pb-1.5 border-b border-rose-100 dark:border-rose-950/60 min-w-0">
-        <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-mono truncate">🚨 What to do on Day 1 (Immediate Priority):</span>
-        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono shrink-0 ml-2" id="urgentTabCount">0 Actions</span>
-      </div>
-      <div id="urgentGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 min-w-0">
-        <!-- Rendered dynamically by app.js -->
-      </div>
-    </section>
-
-    <!-- TAB 2: MONEY & INSURANCE -->
-    <section id="tab-finance" class="tab-content hidden space-y-4 min-w-0">
-      <div class="flex items-center justify-between pb-1.5 border-b border-blue-100 dark:border-blue-950/60 min-w-0">
-        <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono truncate">💳 Bank Accounts & Insurance Lifelines:</span>
-        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono shrink-0 ml-2" id="financeTabCount">0 Accounts Mapped</span>
-      </div>
-      <div id="financeGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 min-w-0">
-        <!-- Rendered dynamically by app.js -->
-      </div>
-    </section>
-
-    <!-- TAB 3: HOME & SHUTOFFS -->
-    <section id="tab-home" class="tab-content hidden space-y-4 min-w-0">
-      <div class="flex items-center justify-between pb-1.5 border-b border-amber-100 dark:border-amber-950/60 min-w-0">
-        <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 font-mono truncate">🏡 Where Things Are In The House:</span>
-        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono shrink-0 ml-2" id="homeTabCount">0 Specs Saved</span>
-      </div>
-      <div id="homeGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 min-w-0">
-        <!-- Rendered dynamically by app.js -->
-      </div>
-    </section>
-
-    <!-- TAB 4: AGING PARENTS HUB -->
-    <section id="tab-parents" class="tab-content hidden space-y-4 min-w-0">
-      <div class="flex items-center justify-between pb-1.5 border-b border-purple-100 dark:border-purple-950/60 min-w-0">
-        <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 font-mono truncate">👵 Aging Parents Medical & Protection:</span>
-        <span class="text-xs md:text-sm text-purple-700 dark:text-purple-300 font-bold bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-800 shrink-0 ml-2">Sandwich Care Node</span>
-      </div>
-      <div id="parentsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 min-w-0">
-        <!-- Rendered dynamically by app.js -->
-      </div>
-    </section>
-
-    <!-- TAB 5: SITTER PASS -->
-    <section id="tab-sitter" class="tab-content hidden space-y-4 min-w-0">
-      <div class="max-w-2xl mx-auto bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 md:p-8 shadow-sm space-y-5 transition-colors min-w-0">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800 min-w-0">
-          <div class="min-w-0">
-            <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-mono">👶 Caregiver Briefing</span>
-            <h3 class="text-lg md:text-xl font-black text-slate-900 dark:text-white font-display truncate" id="sitterHeaderTitle">Babysitter & Caregiver Briefing</h3>
-            <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Enter routines below and tap "Copy SMS" to text your caregiver in seconds.</p>
-          </div>
-          <div class="flex items-center gap-2.5 shrink-0">
-            <button id="saveSitterBtn" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-bold transition-all border border-emerald-200 dark:border-emerald-800 active:scale-95 shrink-0">
-              💾 Save
-            </button>
-            <button id="copySitterAction" type="button" class="px-3.5 sm:px-4.5 py-2 sm:py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center gap-1.5 sm:gap-2 font-display active:scale-95 shrink-0">
-              <span>📋</span>
-              <span>Copy SMS</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="space-y-4.5 text-sm min-w-0">
-          <!-- Children Names -->
-          <div class="min-w-0">
-            <label for="sitterKidsInput" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Children & Ages</label>
-            <input id="sitterKidsInput" type="text" maxlength="150" placeholder="e.g. Leo (Age 7) & Maya (Age 4)"
-              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words">
-          </div>
-
-          <!-- Allergy Box -->
-          <div class="min-w-0">
-            <label for="sitterAllergiesInput" class="block font-bold text-rose-700 dark:text-rose-400 mb-1.5">⚠️ Allergies & Medications</label>
-            <textarea id="sitterAllergiesInput" rows="2" maxlength="500" placeholder="e.g. Severe Peanut Allergy (EpiPen in kitchen cabinet above stove) or No known allergies."
-              class="w-full bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-rose-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words"></textarea>
-          </div>
-
-          <!-- Contacts Box -->
-          <div class="min-w-0">
-            <label for="sitterContactsInput" class="block font-bold text-blue-700 dark:text-blue-400 mb-1.5">📞 Emergency Phone Numbers</label>
-            <textarea id="sitterContactsInput" rows="2" maxlength="500" placeholder="e.g. Parents: (555) 012-3456 / Pediatrician: Dr. Bennett (555) 902-1144"
-              class="w-full bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-blue-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words"></textarea>
-          </div>
-
-          <!-- House & Bedtime Box -->
-          <div class="min-w-0">
-            <label for="sitterHouseInput" class="block font-bold text-amber-700 dark:text-amber-400 mb-1.5">🏡 House Codes, Wi-Fi & Bedtimes</label>
-            <textarea id="sitterHouseInput" rows="3" maxlength="600" placeholder="e.g. Front Door Code: #4829 • Wi-Fi: FamilyNet (Pass: SecretPass) • Bedtimes: 7:30 PM & 8:15 PM"
-              class="w-full bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-amber-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words"></textarea>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ================= ADD / EDIT RECORD MODAL ================= -->
-  <div id="recordModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
-    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-5 sm:p-6 md:p-7 shadow-2xl relative animate-scaleUp max-h-[92vh] overflow-y-auto">
-      <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100 dark:border-slate-800 min-w-0">
-        <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display truncate" id="modalHeading">Add New Household Lifeline</h3>
-        <button id="closeModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1 shrink-0" aria-label="Close dialog">✕</button>
-      </div>
-
-      <input type="hidden" id="editRecordId" value="">
-
-      <div class="space-y-4 text-sm">
-        <div>
-          <label for="cardCat" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Vault Category</label>
-          <select id="cardCat" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm">
-            <option value="urgent">🚨 First 24h Immediate Priority</option>
-            <option value="finance">💳 Insurance, Accounts & Mortgages</option>
-            <option value="home">🏡 Home Shutoff Valves & Specs</option>
-            <option value="parents">👵 Aging Parent Health & Protection</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="cardBadge" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Badge Tag</label>
-          <input id="cardBadge" type="text" maxlength="30" placeholder="e.g. CALL FIRST, LIFE POLICY, WATER, DPOA, CASH"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 uppercase placeholder:text-slate-400 dark:placeholder:text-slate-500">
-        </div>
-
-        <div>
-          <label for="cardTitle" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Title / Name <span class="text-rose-500">*</span></label>
-          <input id="cardTitle" type="text" maxlength="120" placeholder="e.g. Main Water Shutoff or Term Life Policy"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-bold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-display text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
-        </div>
-
-        <div>
-          <label for="cardRef" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Account #, Phone, or Exact Location</label>
-          <input id="cardRef" type="text" maxlength="100" placeholder="e.g. Policy # 7749201 or Basement North Wall"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-mono text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
-        </div>
-
-        <div>
-          <label for="cardNotes" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Instructions for Next-of-Kin</label>
-          <textarea id="cardNotes" rows="3" maxlength="800" placeholder="Step-by-step guidance, safe combinations, contacts, or draft dates..."
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words"></textarea>
-        </div>
-      </div>
-
-      <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
-        <button id="deleteRecordModalBtn" type="button" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-bold text-xs sm:text-sm hidden active:scale-95 shrink-0">
-          🗑️ Delete Record
-        </button>
-        <div class="flex items-center gap-2 sm:gap-2.5 ml-auto shrink-0">
-          <button id="cancelModal" type="button" class="px-3.5 sm:px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-xs sm:text-sm active:scale-95">Cancel</button>
-          <button id="saveCardBtn" type="button" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/20 font-display active:scale-95">
-            Save to Vault
+          <button class="text-button" id="privacyBtn">
+            How your information is kept ↗
           </button>
         </div>
+      </aside>
+      <div class="workspace">
+        <header class="topbar">
+          <div class="breadcrumb">
+            Workspace <span>/</span> <strong id="breadcrumb">Overview</strong>
+          </div>
+          <div class="topbar-actions">
+            <span class="save-status" id="saveStatus" role="status"
+              >Saved on this browser</span
+            ><button
+              class="button secondary small"
+              id="backupBtn"
+              aria-haspopup="dialog"
+              aria-controls="backupDialog"
+            >
+              <span aria-hidden="true">↥</span> Backup & restore
+            </button>
+          </div>
+        </header>
+        <div class="demo-banner" id="demoBanner" hidden>
+          <span
+            >You’re exploring a fictional household. Your personal records are
+            untouched.</span
+          ><button class="button small" id="exitDemoBtn">
+            Back to my household
+          </button>
+        </div>
+        <div
+          class="storage-warning"
+          id="storageWarning"
+          role="alert"
+          hidden
+        ></div>
+        <main id="main" tabindex="-1">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow" id="pageEyebrow">
+                A LITTLE PREPARATION. A LOT OF PEACE OF MIND.
+              </p>
+              <h1 id="pageTitle">Your family, in good hands.</h1>
+              <p class="page-description" id="pageDescription">
+                Make the important things easy to find, even when you’re not
+                there.
+              </p>
+            </div>
+            <button
+              class="button primary"
+              id="printBtn"
+              aria-haspopup="dialog"
+              aria-controls="packetDialog"
+            >
+              <span aria-hidden="true">▤</span> Create handover
+            </button>
+          </div>
+          <div id="pageContent"></div>
+          <footer class="page-footer">
+            <span>Made for the people who count on you.</span
+            ><span>Ark · Local edition <span class="status-dot"></span></span>
+          </footer>
+        </main>
       </div>
     </div>
-  </div>
-
-  <!-- ================= FAMILY NAME MODAL ================= -->
-  <div id="familyNameModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
-    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-5 sm:p-6 shadow-2xl relative animate-scaleUp">
-      <h3 class="text-base font-black text-slate-900 dark:text-white font-display mb-1">Set Household Name</h3>
-      <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-4">This name will appear on all digital views and printed binders.</p>
-      
-      <input id="familyNameInput" type="text" maxlength="80" placeholder="e.g. The Davis Family"
-        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-slate-100 font-bold text-sm md:text-base focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 mb-4 font-display">
-
-      <div class="flex justify-end gap-2.5">
-        <button id="cancelFamilyBtn" type="button" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">Cancel</button>
-        <button id="saveFamilyBtn" type="button" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm font-display active:scale-95">
-          Save Name
+    <section
+      id="printPacket"
+      class="print-only"
+      aria-label="Handover packet"
+    ></section>
+    <dialog
+      id="recordDialog"
+      class="dialog-frame"
+      aria-labelledby="recordHeading"
+      aria-describedby="recordPrompt"
+    >
+      <form id="recordForm">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow" id="recordStep">HOUSEHOLD NOTE</p>
+            <h2 id="recordHeading">Add a note</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close
+            aria-label="Close note"
+          >
+            ×
+          </button>
+        </div>
+        <p class="form-error" id="recordError" role="alert"></p>
+        <div class="dialog-body">
+          <p class="help" id="recordPrompt"></p>
+          <input type="hidden" id="recordId" /><input
+            type="hidden"
+            id="recordTemplate"
+          />
+          <label>Section<select id="recordSection"></select></label
+          ><label
+            >Title<input
+              id="recordTitle"
+              required
+              maxlength="120"
+              autocomplete="off"
+          /></label>
+          <label
+            >Contact or location<input
+              id="recordRef"
+              aria-describedby="recordStorageHint"
+              maxlength="300"
+              autocomplete="off"
+          /></label>
+          <label
+            >What should they know?<textarea
+              id="recordNotes"
+              aria-describedby="recordStorageHint"
+              rows="5"
+              maxlength="4000"
+              placeholder="Where to look, who to call, and the next practical step."
+            ></textarea>
+          </label>
+          <p class="field-note" id="recordStorageHint">
+            Keep passwords, PINs, full identity numbers, and safe combinations
+            in a suitable secure place. Record how an authorized person can find
+            them.
+          </p>
+        </div>
+        <div class="dialog-actions">
+          <button class="button secondary" type="button" data-close>
+            Cancel</button
+          ><button class="button primary" type="submit">Save note</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="profileDialog"
+      class="dialog-frame"
+      aria-labelledby="profileHeading"
+    >
+      <form id="profileForm">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">MAKE IT YOURS</p>
+            <h2 id="profileHeading">Your handover plan</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close
+            aria-label="Close household settings"
+          >
+            ×
+          </button>
+        </div>
+        <p class="form-error" id="profileError" role="alert"></p>
+        <div class="dialog-body">
+          <p class="help">
+            A packet is useful only when someone knows where to find it.
+          </p>
+          <label
+            >Household name<input
+              id="profileName"
+              maxlength="80"
+              required /></label
+          ><label
+            >Who should use this?<input
+              id="profileRecipient"
+              maxlength="160"
+              placeholder="e.g. Jamie, my partner"
+          /></label>
+          <label
+            >Where will the printed packet be?<input
+              id="profileLocation"
+              maxlength="300"
+              placeholder="e.g. Blue folder in the study" /></label
+          ><label
+            >Where will the backup be?<input
+              id="profileBackup"
+              maxlength="300"
+              placeholder="e.g. USB with our important papers"
+          /></label>
+          <p class="field-note">
+            Tell this person how to access the packet. Keep the backup
+            passphrase somewhere they can find independently.
+          </p>
+        </div>
+        <div class="dialog-actions">
+          <button class="button secondary" type="button" data-close>
+            Cancel</button
+          ><button class="button primary" type="submit">Save plan</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="backupDialog"
+      class="dialog-frame"
+      aria-labelledby="backupHeading"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">KEEP ANOTHER COPY</p>
+          <h2 id="backupHeading">Backup & restore</h2>
+        </div>
+        <button class="icon-button" data-close aria-label="Close backups">
+          ×
         </button>
       </div>
-    </div>
-  </div>
-
-  <!-- ================= BACKUP / RESTORE MODAL ================= -->
-  <div id="backupModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
-    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-5 sm:p-6 shadow-2xl relative space-y-4 animate-scaleUp max-h-[92vh] overflow-y-auto">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 min-w-0">
-        <div class="min-w-0">
-          <h3 class="text-base font-black text-slate-900 dark:text-white font-display truncate">Offline Vault Storage & Backup</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Your data never touches the cloud. Keep your own backups.</p>
-        </div>
-        <button id="closeBackupModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1 shrink-0" aria-label="Close dialog">✕</button>
-      </div>
-
-      <!-- Export -->
-      <div class="p-4 sm:p-4.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-2.5">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">💾</span>
-          <h4 class="text-sm font-black text-indigo-950 dark:text-indigo-200 font-display">Export Encrypted Backup (.json)</h4>
-        </div>
-        <p class="text-xs md:text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed break-words">
-          Downloads your complete household vault to a single file. Store on a safe USB drive or external drive.
+      <p class="form-error" id="backupError" role="alert"></p>
+      <p class="success-message" id="backupSuccess" role="status"></p>
+      <div class="dialog-body">
+        <p class="help">
+          Browser data can be cleared or lost. Download a backup after important
+          changes and test it on another browser.
         </p>
-        <button id="downloadBackupBtn" type="button" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-all shadow-sm font-display active:scale-95">
-          Download ark-backup.json
-        </button>
-      </div>
-
-      <!-- Import -->
-      <div class="p-4 sm:p-4.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">📥</span>
-          <h4 class="text-sm font-black text-slate-900 dark:text-slate-100 font-display">Restore from Backup (.json)</h4>
+        <form id="exportForm" class="sub-panel">
+          <h3>Download an encrypted backup</h3>
+          <p id="exportHint">
+            Only the backup file is encrypted. Your working browser copy is not.
+            We cannot recover a forgotten passphrase.
+          </p>
+          <label
+            >New backup passphrase<input
+              type="password"
+              id="exportPassword"
+              aria-describedby="exportHint"
+              minlength="12"
+              maxlength="256"
+              required
+              autocomplete="new-password"
+              placeholder="At least 12 characters" /></label
+          ><label
+            >Repeat passphrase<input
+              type="password"
+              id="exportConfirm"
+              maxlength="256"
+              required
+              autocomplete="new-password" /></label
+          ><button class="button primary full" id="exportSubmit">
+            Encrypt & download
+          </button>
+        </form>
+        <form id="importForm" class="sub-panel">
+          <h3>Restore an existing backup</h3>
+          <p>
+            Encrypted Ark backups and older, unencrypted Ark JSON files are
+            supported. Review the file before replacing anything.
+          </p>
+          <label
+            >Backup file<input
+              type="file"
+              id="importFile"
+              accept=".json,application/json"
+              required /></label
+          ><label
+            >Backup passphrase <span class="optional">if encrypted</span
+            ><input
+              type="password"
+              id="importPassword"
+              maxlength="256"
+              autocomplete="off" /></label
+          ><button class="button secondary full" id="importSubmit">
+            Check backup
+          </button>
+        </form>
+        <div id="restorePreview" class="restore-preview" hidden>
+          <h3>Ready to restore</h3>
+          <p id="restoreSummary"></p>
+          <p>
+            Your current browser copy will be replaced. Download a backup first
+            if you need to keep it.
+          </p>
+          <button id="confirmRestoreBtn" class="button primary">
+            Replace with this backup</button
+          ><button id="cancelRestoreBtn" class="text-button">
+            Cancel restore
+          </button>
         </div>
-        <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed break-words">
-          Select an Ark backup file to restore your vault onto this computer or browser.
+        <section class="sub-panel" aria-labelledby="browserCopyHeading">
+          <h3 id="browserCopyHeading">This browser copy</h3>
+          <p>
+            Ark can keep an automatic previous copy on this device for recovery.
+            This recovery copy is local and unencrypted, just like your working
+            notes.
+          </p>
+          <button
+            type="button"
+            class="button secondary full"
+            id="recoverPreviousBtn"
+          >
+            Recover previous copy
+          </button>
+          <p>
+            Deleting browser data removes Ark’s local copies from this browser.
+            It does not remove downloaded backups, PDFs, or printed packets.
+          </p>
+          <button
+            type="button"
+            class="button secondary full danger"
+            id="deleteHouseholdBtn"
+          >
+            Delete browser data
+          </button>
+        </section>
+      </div>
+    </dialog>
+    <dialog
+      id="packetDialog"
+      class="wide-dialog dialog-frame"
+      aria-labelledby="packetHeading"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">INFORMATION FOR THE RIGHT PERSON</p>
+          <h2 id="packetHeading">Create a handover</h2>
+        </div>
+        <button class="icon-button" data-close aria-label="Close handover">
+          ×
+        </button>
+      </div>
+      <p class="form-error" id="packetError" role="alert"></p>
+      <div class="dialog-body">
+        <p class="help">
+          Choose a starting point, then check exactly what you want to include.
+          Printed and copied information is unencrypted and cannot be revoked.
         </p>
-        <input type="file" id="importFileInput" accept=".json" class="hidden">
-        <button id="triggerImportBtn" type="button" class="w-full py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm font-bold transition-all shadow-sm font-display active:scale-95">
-          Select Backup File to Restore
+        <div class="packet-presets" role="group" aria-label="Packet presets">
+          <button class="button secondary" data-preset="family">
+            Family handover</button
+          ><button class="button secondary" data-preset="care">
+            Caregiver briefing
+          </button>
+        </div>
+        <div id="packetSelection" class="packet-selection"></div>
+        <label class="check-label"
+          ><input type="checkbox" id="includePlan" checked /> Include household
+          handover locations and practice date</label
+        >
+        <div class="packet-preview" id="packetPreview"></div>
+      </div>
+      <div class="dialog-actions">
+        <button class="button secondary" id="copyPacketBtn">Copy text</button
+        ><button class="button primary" id="printPacketBtn">
+          Print / save PDF
         </button>
       </div>
-
-      <div class="text-right">
-        <button id="doneBackupBtn" type="button" class="px-5 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">
-          Close
+    </dialog>
+    <dialog
+      id="privacyDialog"
+      class="dialog-frame"
+      aria-labelledby="privacyHeading"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">PRIVACY, IN PLAIN WORDS</p>
+          <h2 id="privacyHeading">Your information stays here.</h2>
+        </div>
+        <button
+          class="icon-button"
+          data-close
+          aria-label="Close privacy details"
+        >
+          ×
         </button>
       </div>
-    </div>
-  </div>
-
-  <!-- ================= TEMPLATE OPTIONS MODAL ================= -->
-  <div id="templateModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
-    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-5 sm:p-6 shadow-2xl relative space-y-4 animate-scaleUp">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 min-w-0">
-        <h3 class="text-base font-black text-slate-900 dark:text-white font-display truncate">Template Options</h3>
-        <button id="closeTemplateModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1 shrink-0" aria-label="Close dialog">✕</button>
+      <div class="prose dialog-body">
+        <p>
+          Ark has no accounts, analytics, external fonts, cloud sync, or remote
+          scripts. The application makes no outbound network requests.
+        </p>
+        <h3>Your browser copy</h3>
+        <p>
+          Notes are stored unencrypted in this browser profile on this device.
+          Someone with access to that profile may read them. Device encryption
+          and your screen lock are your responsibility.
+        </p>
+        <h3>Your backups</h3>
+        <p>
+          Downloaded backups use AES-256-GCM with a passphrase-derived key.
+          Backups do not protect an unlocked browser or a compromised device.
+          Keep a strong passphrase and give your trusted person a separate way
+          to find it.
+        </p>
+        <h3>Your responsibility</h3>
+        <p>
+          Clearing browser data, private browsing, changing browser profiles, or
+          moving the app can make records unavailable. Directly opened files
+          have browser-dependent storage behavior. Keep and test a backup; print
+          a current packet.
+        </p>
+        <h3>What Ark does</h3>
+        <p>
+          Ark organizes information and document locations. It does not create
+          legal authority, give medical or financial advice, notify
+          institutions, or grant access to accounts. Review legal and care
+          instructions with a qualified professional. If there is immediate
+          danger, contact local emergency services.
+        </p>
+        <h3>Support &amp; product version</h3>
+        <p>
+          Ark local edition <span id="appVersion"></span>. Report a software
+          problem through
+          <a
+            href="https://github.com/rvreddy24/Ark-Vault/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub Issues (opens in a new tab)</a
+          >. Opening this link connects to GitHub.
+        </p>
+        <p>
+          Never attach household notes, backup files, passphrases, or other
+          personal information to a support request. Describe the steps and
+          browser version using fictional examples.
+        </p>
       </div>
-
-      <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed break-words">
-        Reset your vault to a clean blank state, or explore with the pre-filled Miller Family demo records.
-      </p>
-
-      <div class="space-y-3">
-        <button id="clearToBlankBtn" type="button" class="w-full text-left p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-900/60 transition-colors active:scale-95">
-          <div class="text-sm font-bold text-rose-800 dark:text-rose-300 font-display">🧹 Clear All to Clean Slate</div>
-          <div class="text-xs text-rose-600 dark:text-rose-400 mt-1 leading-relaxed break-words">Clears all cards and resets the vault to clean blank state.</div>
+      <button class="button secondary full" data-close>Got it</button>
+    </dialog>
+    <dialog id="confirmDialog" aria-labelledby="confirmHeading">
+      <div class="dialog-heading">
+        <h2 id="confirmHeading">Please confirm</h2>
+        <button class="icon-button" data-close aria-label="Close confirmation">
+          ×
         </button>
-
-        <button id="loadSampleDataBtn" type="button" class="w-full text-left p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/50 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors active:scale-95">
-          <div class="text-sm font-bold text-slate-800 dark:text-slate-200 font-display">✨ Load Demo Example Records</div>
-          <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed break-words">Populates the vault with demo records so you can see how it works.</div>
-        </button>
       </div>
-
-      <div class="text-right pt-2">
-        <button id="cancelTemplateBtn" type="button" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">
-          Cancel
-        </button>
+      <p id="confirmMessage" class="help"></p>
+      <label id="deleteConfirmLabel" hidden
+        >Type your household name
+        <input id="deleteConfirmName" maxlength="80" autocomplete="off" />
+      </label>
+      <p id="confirmError" class="form-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="button secondary" data-close>Cancel</button
+        ><button class="button primary" id="confirmAction">Confirm</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification (Elevated z-index z-[60]) -->
-  <div id="toast" class="fixed bottom-6 right-6 z-[60] px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs sm:text-sm font-bold shadow-2xl transition-all transform translate-y-16 opacity-0 pointer-events-none flex items-center gap-2.5 no-print font-display max-w-[90vw] break-words">
-    <span class="text-base shrink-0">✨</span>
-    <span id="toastMsg" class="break-words">Action completed!</span>
-  </div>
-
-  <!-- Footer -->
-  <footer class="w-full bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-800 py-4 px-4 sm:px-6 text-center text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono transition-colors duration-200 no-print">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 min-w-0">
-      <div class="truncate">Ark Vault • Digital Edition • 100% Offline Local Storage</div>
-      <div class="flex items-center gap-3 shrink-0">
-        <span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon inline-block"></span>
-          System Status: Fully Private
-        </span>
-        <span class="text-slate-300 dark:text-slate-700">•</span>
-        <span>Zero Network Outbound</span>
-      </div>
-    </div>
-  </footer>
-
-  <script src="app.js"></script>
-</body>
+    </dialog>
+    <dialog
+      id="drillDialog"
+      class="dialog-frame"
+      aria-labelledby="drillHeading"
+    >
+      <form id="drillForm">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">A SMALL PRACTICE RUN</p>
+            <h2 id="drillHeading">Try the handover together.</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close
+            aria-label="Close practice checklist"
+          >
+            ×
+          </button>
+        </div>
+        <p class="form-error" id="drillError" role="alert"></p>
+        <div class="dialog-body">
+          <p class="help">
+            Ask your trusted person to do these without your help. Record the
+            practice only after you have tried it together.
+          </p>
+          <label class="check-label"
+            ><input type="checkbox" required /> They found the printed packet
+            and know when it was updated.</label
+          ><label class="check-label"
+            ><input type="checkbox" required /> They found the first contact,
+            bill instructions, and important document locations.</label
+          ><label class="check-label"
+            ><input type="checkbox" required /> We restored a backup in another
+            browser and confirmed the notes were there.</label
+          >
+        </div>
+        <div class="dialog-actions">
+          <button class="button secondary" type="button" data-close>
+            Later</button
+          ><button class="button primary">Record practice</button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast no-print" role="status" hidden></div>
+    <noscript
+      >Ark needs JavaScript enabled to display and save your household notes. No
+      data is sent to a server.</noscript
+    >
+  </body>
 </html>

@@ -1,0 +1,49 @@
+name: Ark checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  native-launchers:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -p "test_*.py"
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: npm run check
+      - run: npm run format:check
+      - run: npm test
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:browser
+      - run: python -m unittest discover -s tests -p "test_*.py"
+      - run: python package_release.py
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: ark-verification
+          path: |
+            artifacts/
+            test-results/
+            Ark-Family-OS-Digital-Edition.zip
+            Ark-Family-OS-Digital-Edition.zip.sha256
