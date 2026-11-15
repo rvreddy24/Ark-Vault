@@ -22,7 +22,15 @@ This uses browser Web Crypto. Automated encryption and validation tests are **no
 
 A write is reported successful only after localStorage accepts it. Failures leave the previous in-memory and saved copy unchanged and keep the form open. Invalid saved data is not silently reset or overwritten. An unreadable-copy download is offered for recovery; it may contain sensitive plaintext. Keep it private. Restore requires explicit replacement confirmation. Original legacy storage remains for recovery and must be cleared separately if you intend to remove it.
 
-Multiple-tab checks prevent ordinary stale overwrites, but localStorage is not a transactional multi-user database. Use one editing tab. Backup/restore is manual, with no merge or synchronization. Downloads must be confirmed by the user; preparing a file does not prove it was saved or stored safely.
+The browser Web Locks API grants one tab an editing lease for its lifetime. Additional tabs are explicitly read-only snapshots: close the editing tab and reload a secondary tab to transfer editing. This avoids relying on immediate cross-process localStorage cache propagation (which is not guaranteed in Firefox). Writes also serialize mutation and recheck the saved copy. A stale or read-only tab refuses to save, delete data, or export a normal backup. A browser without coordination support must be upgraded before editing. There is no merge or synchronization. A page restored from the browser's back/forward cache reloads to reacquire ownership and refresh data.
+
+Forms are temporarily disabled during a write, and changed drafts require explicit dismissal. Page-close warnings depend on browser support and are not crash recovery. Another application or older Ark version does not participate in this lease; do not edit one origin using different Ark versions simultaneously.
+
+Before a change, Ark tries to retain one previous browser copy under `ark_handover_previous_v1`. This recovery copy is **also unencrypted**. If quota prevents keeping it, saving can still succeed with an explicit warning. A failed working-copy write rolls back the previous-copy snapshot. Recover previous copy previews the candidate before replacement; swapping makes the replaced copy the next recovery candidate. This is not a separate-device backup and does not survive clearing browser data.
+
+Backup & restore > Delete browser data requires typing the household name and removes Ark's current, previous, and legacy storage keys from this profile. It does not remove downloaded files, clipboard contents, printouts, other browser profiles, or other devices. Individual note deletion can leave that note in previous/legacy copies until they are replaced or explicitly removed.
+
+Downloads must be confirmed by the user; preparing a file does not prove it was saved or stored safely. Closing the backup dialog cancels a pending export, and cancelled or superseded restore checks cannot replace the current preview. Backups up to 32 MiB are accepted; this bound accommodates every schema-valid encrypted export, including Unicode and escaped characters.
 
 ## Shared copies and limits
 

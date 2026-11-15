@@ -117,6 +117,9 @@ test("encrypted download round-trips through a second browser context and requir
     null,
   );
   await other.getByRole("button", { name: "Replace with this backup" }).click();
+  await expect(other.locator("#backupSuccess")).toContainText(
+    "Backup restored",
+  );
   expect(
     JSON.parse(await other.evaluate((key) => localStorage.getItem(key), key))
       .records[0].title,
@@ -249,8 +252,8 @@ test("stale tabs cannot overwrite the newer copy", async ({
   await other.goto("http://localhost:5017/");
   await addFirst(page);
   await expect(other.locator("#storageWarning")).toContainText("Another tab");
-  await addFirst(other, "Stale contact");
-  await expect(other.locator("#recordError")).toContainText("Another tab");
+  await expect(other.locator(".hero [data-essential]")).toBeDisabled();
+  await expect(other.locator("#saveStatus")).toHaveText("Read-only snapshot");
   const stored = JSON.parse(
     await other.evaluate((key) => localStorage.getItem(key), key),
   );
@@ -345,4 +348,18 @@ test("browser printing before packet selection does not disclose household notes
     "Create a handover first",
   );
   await expect(page.locator("#printPacket")).not.toContainText("Taylor");
+});
+
+test("unsupported editing coordination degrades to an honest read-only view", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, "locks", { get: () => undefined }),
+  );
+  await page.goto("/");
+  await expect(page.locator("#storageWarning")).toContainText(
+    "cannot coordinate safe editing",
+  );
+  await expect(page.locator(".hero [data-essential]")).toBeDisabled();
+  await expect(page.locator("#saveStatus")).toHaveText("Read-only snapshot");
 });

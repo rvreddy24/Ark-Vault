@@ -1320,6 +1320,9 @@ input[type="file"] {
   margin: 18mm;
 }
 @media print {
+  html {
+    background: #fff !important;
+  }
   .no-print,
   dialog,
   .skip-link {
@@ -1439,4 +1442,268 @@ progress::-moz-progress-bar {
   .essential-row > .text-button[data-essential] {
     margin-left: auto;
   }
+}
+/* Screen readability, comfortable controls, and contained dialog scrolling. */
+@media screen {
+  :root {
+    font-size: 16px;
+  }
+  .page-description,
+  .record-notes,
+  .help,
+  .prose p,
+  .practice-card p,
+  .checklist-simple p,
+  .section-hint,
+  .empty-section p,
+  .check-label,
+  label {
+    font-size: 14px;
+  }
+  .record-card .record-ref,
+  .plan-panel > p,
+  .note-card p,
+  .hero p:not(.eyebrow),
+  .sub-panel p,
+  .field-note,
+  .optional,
+  .essential-body p,
+  .progress-caption,
+  .bottom-tip,
+  .sidebar-bottom p,
+  .packet-preview p {
+    font-size: 13px;
+  }
+  .page-footer,
+  .breadcrumb,
+  .save-status,
+  .local-status,
+  .household-switch small,
+  .sidebar-bottom .text-button,
+  .workspace-label,
+  .nav-count,
+  dt,
+  .pill {
+    font-size: 11px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 1.3px;
+  }
+  .hero .eyebrow,
+  .hero .button,
+  .plan-panel .button,
+  .note-card .text-button,
+  .nav-link,
+  .record-actions .text-button {
+    font-size: 13px;
+  }
+  .essential-body h3,
+  .household-switch strong {
+    font-size: 14px;
+  }
+  .button,
+  .button.small {
+    font-size: 13px;
+    min-height: 44px;
+  }
+  .icon-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .text-button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .essential-row > .text-button {
+    min-height: 44px;
+    min-width: 44px;
+    font-size: 12px;
+  }
+  .nav-link {
+    min-height: 44px;
+  }
+  input:not([type="checkbox"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  input[type="file"] {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+  .check-label {
+    min-height: 44px;
+  }
+  .check-label input {
+    margin-top: 4px;
+  }
+  .check-label > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .household-switch,
+  .topbar-actions,
+  .page-heading > div,
+  .dialog-heading > div {
+    min-width: 0;
+  }
+  .dialog-heading h2 {
+    overflow-wrap: anywhere;
+  }
+  dialog.dialog-frame[open] {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: calc(100dvh - 32px);
+  }
+  dialog.dialog-frame > form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: calc(100dvh - 90px);
+  }
+  .dialog-frame .dialog-heading,
+  .dialog-frame .dialog-actions,
+  .dialog-frame > .button {
+    flex-shrink: 0;
+  }
+  .dialog-body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px;
+    margin: 0 -4px;
+    scrollbar-gutter: stable;
+  }
+  .dialog-frame .dialog-actions {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .dialog-frame > .button {
+    margin-top: 16px;
+  }
+  .dialog-frame .dialog-body .help {
+    margin-top: 0;
+  }
+  .packet-selection {
+    max-height: 260px;
+  }
+  .packet-preview {
+    margin-bottom: 8px;
+  }
+  .prose a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+  .button.danger {
+    color: #a44433;
+  }
+}
+@media screen and (max-width: 700px) {
+  .sidebar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .household-switch strong {
+    max-width: 100%;
+  }
+  .household-switch small {
+    font-size: 10px;
+  }
+  .topbar {
+    height: auto;
+    min-height: 68px;
+    padding: 12px 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .topbar .button {
+    font-size: 12px;
+  }
+  .breadcrumb {
+    font-size: 12px;
+  }
+  .page-footer {
+    font-size: 11px;
+  }
+  .page-description {
+    font-size: 14px;
+  }
+  .essential-row {
+    column-gap: 10px;
+  }
+  .essential-body {
+    min-width: min(160px, 100%);
+  }
+  .essential-body h3 {
+    font-size: 14px;
+  }
+  .essential-body p {
+    font-size: 13px;
+  }
+  .essential-row > .text-button[data-essential] {
+    margin-left: 42px;
+  }
+  .essential-row > .text-button[data-exclude] {
+    margin-left: auto;
+  }
+  dialog {
+    padding: 20px;
+  }
+  dialog.dialog-frame > form {
+    max-height: calc(100dvh - 74px);
+  }
+  .dialog-actions {
+    flex-wrap: wrap;
+  }
+  .dialog-actions .button {
+    min-width: 0;
+  }
+}
+@media screen and (max-width: 480px) {
+  .hero-copy {
+    max-width: 100%;
+  }
+  .hero-art {
+    display: none;
+  }
+  .hero {
+    min-height: 0;
+  }
+  .panel-header {
+    flex-wrap: wrap;
+  }
+  .panel-header .pill {
+    white-space: normal;
+  }
+  .packet-presets .button {
+    flex: 1;
+  }
+  .section-toolbar {
+    flex-wrap: wrap;
+  }
+  .dialog-heading {
+    gap: 12px;
+  }
+  .dialog-heading h2 {
+    font-size: 21px;
+  }
+}
+@media screen {
+  .dialog-frame .form-error,
+  .dialog-frame .success-message {
+    flex-shrink: 0;
+    margin: 0 0 12px;
+    max-height: 22dvh;
+    overflow-y: auto;
+  }
+}
+.help,
+.form-error,
+.success-message,
+.notice {
+  overflow-wrap: anywhere;
 }

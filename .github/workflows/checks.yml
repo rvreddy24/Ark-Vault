@@ -5,6 +5,19 @@ on:
 permissions:
   contents: read
 jobs:
+  native-launchers:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -p "test_*.py"
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -33,3 +46,4 @@ jobs:
             artifacts/
             test-results/
             Ark-Family-OS-Digital-Edition.zip
+            Ark-Family-OS-Digital-Edition.zip.sha256

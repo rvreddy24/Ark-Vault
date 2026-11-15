@@ -2,10 +2,14 @@
 (function (root) {
   "use strict";
   const VERSION = 4;
+  const APP_VERSION = "4.1.0";
   const STORAGE_KEY = "ark_handover_v4";
   const LEGACY_KEY = "ark_vault_data_clean_v3";
+  const RECOVERY_KEY = "ark_handover_previous_v1";
   const ITERATIONS = 600000;
-  const MAX_BYTES = 5 * 1024 * 1024;
+  // Covers every schema-valid export, including JSON-escaped control characters
+  // and the AES-GCM/base64 envelope. Preserve existing version-4 data limits.
+  const MAX_BYTES = 32 * 1024 * 1024;
   const SECTIONS = [
     {
       id: "people",
@@ -202,6 +206,8 @@
         updatedAt: date(r.updatedAt),
         reviewedAt: date(r.reviewedAt, true),
       };
+      if (r.legacyLabel !== undefined)
+        entry.legacyLabel = text(r.legacyLabel, 120, "legacy label");
       if (!entry.title.trim() || (!entry.ref.trim() && !entry.notes.trim()))
         throw new Error(
           "Each note needs a title and a contact, location, or instruction.",
@@ -259,6 +265,9 @@
             (!ref ? "Imported note: please add current instructions." : ""),
           updatedAt: result.updatedAt,
           reviewedAt: null,
+          ...(r.badge
+            ? { legacyLabel: text(r.badge, 120, "legacy label") }
+            : {}),
         });
       }
     }
@@ -271,18 +280,28 @@
         throw new Error("Invalid legacy care briefing.");
       const lines = ["kids", "allergies", "contacts", "house"]
         .map((key) => {
-          const value = text(data.sitter[key] ?? "", 2000, "legacy care field");
+          const value = text(
+            data.sitter[key] ?? "",
+            100000,
+            "legacy care field",
+          );
           return value ? `${key.toUpperCase()}\n${value}` : "";
         })
         .filter(Boolean);
-      if (lines.length)
+      const combined = lines.join("\n\n");
+      const chunks = [];
+      // Older care textareas had no UI length limit. Split instead of silently
+      // discarding instructions or treating an otherwise valid household as corrupt.
+      for (let offset = 0; offset < combined.length; offset += 3900)
+        chunks.push(combined.slice(offset, offset + 3900));
+      for (const [index, notes] of chunks.entries())
         result.records.push({
-          id: "legacy-sitter",
+          id: `legacy-sitter-${index}`,
           template: null,
           section: "care",
-          title: "Imported caregiver briefing",
+          title: `Imported caregiver briefing${chunks.length > 1 ? ` (part ${index + 1} of ${chunks.length})` : ""}`,
           ref: "",
-          notes: lines.join("\n\n"),
+          notes,
           updatedAt: result.updatedAt,
           reviewedAt: null,
         });
@@ -323,6 +342,35 @@
     const clean = validate(value);
     storage.setItem(STORAGE_KEY, JSON.stringify(clean));
     return clean;
+  }
+  function persistWithRecovery(storage, value, previousRaw = null) {
+    const clean = validate(value);
+    let previousRecovery = null,
+      recoverySaved = null;
+    if (previousRaw !== null) {
+      previousRecovery = storage.getItem(RECOVERY_KEY);
+      try {
+        storage.setItem(RECOVERY_KEY, previousRaw);
+        recoverySaved = true;
+      } catch {
+        recoverySaved = false;
+      }
+    }
+    try {
+      persist(storage, clean);
+    } catch (error) {
+      if (recoverySaved) {
+        if (previousRecovery === null) storage.removeItem(RECOVERY_KEY);
+        else storage.setItem(RECOVERY_KEY, previousRecovery);
+        // Recovery is optional: it must not consume the space needed by the
+        // working copy. A failed primary write must preserve the older recovery.
+        if (error.name === "QuotaExceededError") {
+          persist(storage, clean);
+          recoverySaved = false;
+        } else throw error;
+      } else throw error;
+    }
+    return { state: clean, recoverySaved };
   }
   function b64(bytes) {
     let s = "";
@@ -371,7 +419,7 @@
       key,
       new TextEncoder().encode(JSON.stringify(clean)),
     );
-    return {
+    const envelope = {
       format: "ark-encrypted",
       version: 1,
       kdf: "PBKDF2-SHA256",
@@ -381,13 +429,16 @@
       iv: b64(iv),
       data: b64(new Uint8Array(encrypted)),
     };
+    if (new TextEncoder().encode(JSON.stringify(envelope)).length > MAX_BYTES)
+      throw new Error("This backup exceeds the 32 MB supported file limit.");
+    return envelope;
   }
   async function decode(raw, password = "") {
     if (
       typeof raw !== "string" ||
       new TextEncoder().encode(raw).length > MAX_BYTES
     )
-      throw new Error("Backup exceeds the 5 MB limit.");
+      throw new Error("Backup exceeds the 32 MB limit.");
     let value;
     try {
       value = JSON.parse(raw);
@@ -478,8 +529,10 @@
   }
   const api = {
     VERSION,
+    APP_VERSION,
     STORAGE_KEY,
     LEGACY_KEY,
+    RECOVERY_KEY,
     MAX_BYTES,
     SECTIONS,
     ESSENTIALS,
@@ -490,6 +543,7 @@
     status,
     progress,
     persist,
+    persistWithRecovery,
     encrypt,
     decode,
     demo,

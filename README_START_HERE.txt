@@ -2,7 +2,7 @@ ARK — START HERE
 A household handover your family can use
 
 1. OPEN ARK
-Recommended: install Python 3, then double-click Start-Ark.bat on Windows.
+Recommended: install Python 3.9+, then double-click Start-Ark.bat on Windows.
 On macOS, open Terminal in this folder and run: bash Start-Ark.command
 Or run: python server.py --open
 Keep the terminal open. Use http://localhost:5000/ consistently.
@@ -57,4 +57,11 @@ Older Ark JSON backups can be imported. Review all imported information and
 remove sensitive secrets; old verification flags are not carried forward.
 The example household never replaces your personal browser copy.
 
-See PRIVACY_AND_SECURITY.md for the backup format and detailed limitations.
+RECOVERY AND DELETION
+Backup & restore > Recover previous copy can preview the previous saved browser
+copy when one exists. It is also unencrypted and optional when storage is full;
+it is not a separate backup. To remove current, previous, and legacy Ark records
+from this browser, choose Delete browser data and type the household name.
+Separate files, paper copies, and other browsers are unchanged.
+
+See SUPPORT.md for troubleshooting and PRIVACY_AND_SECURITY.md for limitations.

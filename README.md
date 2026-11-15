@@ -4,7 +4,7 @@ Ark is an offline browser workspace for the people, documents, routines, and pra
 
 ## Run locally
 
-Python 3 is recommended for a consistent browser origin:
+Python 3.9+ is recommended for a consistent browser origin:
 
 ```sh
 python server.py --open
@@ -30,7 +30,9 @@ You can also open `public/index.html` directly. File-URL storage behavior varies
 
 Browser storage can be deleted or unavailable. Save failures remain visible and do not show success. Keep separate backups and test restore on another browser. Passphrases cannot be recovered. Printed/copied packets are unencrypted and cannot be revoked. See [PRIVACY_AND_SECURITY.md](PRIVACY_AND_SECURITY.md).
 
-Older same-origin records are migrated into unreviewed notes; they are not assumed to fulfill the new essentials. Original legacy storage is retained. Invalid saved data is preserved and blocks normal writes until a valid restore. Concurrent tabs refuse ordinary stale overwrites; reload before saving. No automatic multi-device sync.
+Older same-origin records, contextual labels, and long care instructions are migrated into unreviewed notes; they are not assumed to fulfill the new essentials. Original legacy storage is retained. Invalid saved data is preserved and blocks normal writes until a valid restore. Browser Web Locks allow one editing tab; secondary tabs are explicitly read-only snapshots. Close the editing tab and reload a secondary tab to transfer ownership. Stale tabs refuse saves and exports. Forms are protected from accidental dismissal and temporarily disabled while saving. No automatic multi-device sync.
+
+Backup & restore also offers a preview of the previous browser copy and explicit deletion of current, previous, and legacy Ark data. Previous-copy recovery is unencrypted, best-effort when storage space permits, and does not replace an external backup. Backup imports accept up to 32 MiB, including every schema-valid encrypted export. See [SUPPORT.md](SUPPORT.md) for recovery, supported launch methods, and the public support channel.
 
 ## Development checks
 
@@ -51,4 +53,4 @@ Browser tests use fictional data only. See `playwright.config.cjs` for browser t
 
 `python package_release.py` creates `Ark-Family-OS-Digital-Edition.zip` from an explicit allowlist. Customer data, development dependencies, and tests are excluded. The historic ZIP filename is retained for compatibility; the product is now positioned as a household handover.
 
-The commercial documents describe hypotheses for validation, not promised sales. Pricing, demand, professional content review, and marketplace eligibility still need validation before a commercial launch.
+The [commercial validation notes](docs/COMMERCIAL_VALIDATION.md) describe hypotheses, not promised sales. The [release checklist](RELEASE_CHECKLIST.md) separates verified software gates from human, hardware, and seller-owned launch decisions.

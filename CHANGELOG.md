@@ -1,5 +1,19 @@
 # Changes
 
+## 4.1.0 — 15 November 2026
+
+- Hardened the release through separate security/data-integrity, usability, and distribution agent reviews. These are internal reviews, not independent certification.
+- Fixed maximum-size backup round trips, preserved legacy contextual labels, and split long imported care instructions without truncation.
+- Added a lifetime single-editor lease. This prevents a reproduced Firefox lost-update race caused by stale per-process localStorage snapshots; secondary tabs are explicitly read-only and reload to take ownership after the original closes.
+- Added protected unsaved forms, disabled controls during writes, focus restoration, cancellation-safe export/recovery operations, and previous-copy recovery that does not consume space needed for a working save.
+- Added exact-household-name confirmation for deleting current, recovery, and legacy browser copies. Backups and other profiles remain separate.
+- Improved 320px/200% reflow, larger text/targets, visible modal actions/errors, support/version details, and clean multi-page PDF output.
+- Hardened loopback Host/Origin/resource handling and same-folder repeated launch detection; tested Windows launcher execution from a Unicode path with spaces.
+- Added a reproducible release manifest with per-file SHA-256 hashes and a separate ZIP checksum. Package tests no longer overwrite the tracked download.
+- Consolidated commercial drafts under docs and removed generated workspace artifacts after verification.
+
+Release checks: 17 core tests; 29 browser scenarios across four targets (116 executions); 14 Python package/server/launcher tests with OS-specific skips. CI exercises Linux, Windows, and macOS. The actual ZIP was extracted to a Unicode path with spaces and passed offline save/review/encrypted-download/second-context restore and local-server checks. Four-page family and two-page caregiver PDF samples were text-checked and visually inspected using fictional data. Actual paper printing and Mac download/quarantine/default-browser behavior still require human hardware acceptance. External commercial decisions remain listed in RELEASE_CHECKLIST.md.
+
 ## 4.0.0 — 15 November 2026
 
 Ark now focuses on a useful household handover instead of an automated family operating system.

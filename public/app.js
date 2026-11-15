@@ -41,21 +41,141 @@ let state = A.blank(),
   conflict = false,
   pendingRestore = null,
   restoreGeneration = 0,
+  exportGeneration = 0,
+  mutationPending = false,
+  editorOwner = false,
+  editorLeaseFailed = false,
+  releaseEditor = null,
   toastTimer;
+const READ_ONLY_MESSAGE =
+  "Another tab owns editing for this household. This tab is a read-only snapshot. Close the editing tab, then reload this one before making changes or exporting a backup.";
+function readOnlyMessage() {
+  if (!navigator.locks?.request)
+    return "This browser cannot coordinate safe editing. This copy is read-only. Open Ark in a current supported browser.";
+  if (editorLeaseFailed)
+    return "Editing could not be enabled. This copy is read-only. Check browser storage permissions and reload.";
+  return READ_ONLY_MESSAGE;
+}
+async function claimEditorSession() {
+  if (!navigator.locks?.request) {
+    warning(
+      "This browser cannot coordinate safe editing. Use a current supported browser.",
+    );
+    return;
+  }
+  await new Promise((resolve) => {
+    navigator.locks
+      .request(
+        "ark-editor-session",
+        { mode: "exclusive", ifAvailable: true },
+        (lock) => {
+          if (!lock) {
+            resolve();
+            return;
+          }
+          editorOwner = true;
+          resolve();
+          return new Promise((release) => {
+            releaseEditor = release;
+          });
+        },
+      )
+      .catch(() => {
+        editorLeaseFailed = true;
+        warning(
+          "Editing could not be enabled. Check browser storage permissions and reload.",
+        );
+        resolve();
+      });
+  });
+}
+function requireEditor() {
+  if (!editorOwner) throw new Error(readOnlyMessage());
+}
+const dialogOpeners = new Map();
+const dialogSnapshots = new Map();
+let disabledDuringMutation = [];
+function setMutationBusy(busy) {
+  mutationPending = busy;
+  document.querySelector(".app-shell").inert = busy;
+  if (busy) {
+    disabledDuringMutation = [
+      ...document.querySelectorAll(
+        "dialog[open] input,dialog[open] select,dialog[open] textarea,dialog[open] button",
+      ),
+    ].map((control) => [control, control.disabled]);
+    disabledDuringMutation.forEach(([control]) => {
+      control.disabled = true;
+    });
+    $("saveStatus").textContent = "Saving change…";
+  } else {
+    disabledDuringMutation.forEach(([control, disabled]) => {
+      control.disabled = disabled;
+    });
+    disabledDuringMutation = [];
+  }
+}
+const EDIT_FORMS = new Set(["recordDialog", "profileDialog", "drillDialog"]);
+async function withWriteLock(action) {
+  if (!navigator.locks?.request)
+    throw new Error(
+      "This browser cannot coordinate safe writes. Open Ark in a current Chrome, Edge, Firefox, or Safari browser.",
+    );
+  return navigator.locks.request(
+    "ark-household-write",
+    { mode: "exclusive", signal: AbortSignal.timeout(5000) },
+    action,
+  );
+}
+function formSnapshot(dialog) {
+  return JSON.stringify(
+    [...dialog.querySelectorAll("input,select,textarea")].map((input) => [
+      input.id,
+      input.type === "checkbox" ? input.checked : input.value,
+    ]),
+  );
+}
+function hasUnsavedChanges(dialog) {
+  return (
+    dialog?.open &&
+    EDIT_FORMS.has(dialog.id) &&
+    dialogSnapshots.get(dialog.id) !== formSnapshot(dialog)
+  );
+}
+function ensureCurrentCopy() {
+  if (conflict || localStorage.getItem(A.STORAGE_KEY) !== lastStored) {
+    conflict = true;
+    throw new Error(
+      "Another tab changed this household. Reload Ark before saving or exporting. Your current form has not been cleared.",
+    );
+  }
+}
 const warning = (message) => {
   $("storageWarning").textContent = message;
   $("storageWarning").hidden = !message;
 };
-function load() {
+async function load() {
   try {
     lastStored = localStorage.getItem(A.STORAGE_KEY);
     if (lastStored !== null) state = A.validate(JSON.parse(lastStored));
     else {
       const legacy = localStorage.getItem(A.LEGACY_KEY);
       if (legacy !== null) {
-        state = A.migrateLegacy(JSON.parse(legacy));
-        A.persist(localStorage, state);
-        lastStored = JSON.stringify(state);
+        if (!editorOwner) {
+          state = A.migrateLegacy(JSON.parse(legacy));
+          return;
+        }
+        await withWriteLock(() => {
+          const current = localStorage.getItem(A.STORAGE_KEY);
+          if (current !== null) {
+            lastStored = current;
+            state = A.validate(JSON.parse(current));
+            return;
+          }
+          state = A.migrateLegacy(JSON.parse(legacy));
+          A.persist(localStorage, state);
+          lastStored = JSON.stringify(state);
+        });
         warning(
           "Your older Ark notes were imported without marking them reviewed. The old browser copy is unchanged. Check imported notes, complete the essentials, and download an encrypted backup.",
         );
@@ -92,29 +212,39 @@ function toast(message) {
   $("toast").hidden = false;
   toastTimer = setTimeout(() => ($("toast").hidden = true), 4500);
 }
-function commit(next, errorId, restore = false) {
+async function commit(next, errorId, restore = false) {
+  if (mutationPending) {
+    if (errorId)
+      $(errorId).textContent =
+        "Another change is being saved. Wait a moment, then try again.";
+    return false;
+  }
+  setMutationBusy(true);
   try {
     next.updatedAt = A.now();
     const clean = A.validate(next);
     if (!demoMode) {
-      if (conflict)
-        throw new Error(
-          "Another tab changed this household. Reload Ark before saving. Your current form has not been cleared.",
-        );
+      requireEditor();
       if (corrupt && !restore)
         throw new Error(
           "Your existing browser copy could not be read. Restore a valid backup first; the existing copy is preserved.",
         );
-      if (localStorage.getItem(A.STORAGE_KEY) !== lastStored) {
-        conflict = true;
-        throw new Error(
-          "Another tab changed this household. Reload Ark before saving.",
+      let safety;
+      await withWriteLock(() => {
+        ensureCurrentCopy();
+        safety = A.persistWithRecovery(
+          localStorage,
+          clean,
+          corrupt ? null : lastStored,
         );
-      }
-      A.persist(localStorage, clean);
-      lastStored = JSON.stringify(clean);
+        lastStored = JSON.stringify(clean);
+      });
       corrupt = false;
-      if (restore) warning("");
+      warning(
+        safety.recoverySaved === false
+          ? "Changes saved, but the previous recovery copy could not be refreshed. Download an encrypted backup."
+          : "",
+      );
     }
     state = clean;
     render();
@@ -126,14 +256,33 @@ function commit(next, errorId, restore = false) {
         : error.message;
     if (errorId) $(errorId).textContent = message;
     warning(message);
-    $("saveStatus").textContent = "Changes not saved";
+    $("saveStatus").textContent =
+      !editorOwner && !demoMode ? "Read-only snapshot" : "Changes not saved";
     return false;
+  } finally {
+    setMutationBusy(false);
   }
 }
 function openDialog(id) {
+  if (mutationPending) return;
+  dialogOpeners.set(id, document.activeElement);
   $(id).showModal();
+  dialogSnapshots.set(id, formSnapshot($(id)));
 }
 function closeDialog(dialog) {
+  if (mutationPending) return;
+  if (hasUnsavedChanges(dialog)) {
+    confirmAction(
+      "Discard unsaved changes?",
+      "Your changes in this form have not been saved. Keep editing to save them, or discard this draft.",
+      "Discard changes",
+      () => {
+        dialog.close();
+        return true;
+      },
+    );
+    return;
+  }
   dialog.close();
 }
 document
@@ -153,15 +302,52 @@ document.querySelectorAll("dialog").forEach((dialog) =>
       event.clientY < box.top ||
       event.clientY > box.bottom
     )
-      dialog.close();
+      closeDialog(dialog);
   }),
 );
-function confirmAction(heading, message, label, action) {
+document.querySelectorAll("dialog").forEach((dialog) => {
+  dialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeDialog(dialog);
+  });
+  dialog.addEventListener("close", () => {
+    dialogSnapshots.delete(dialog.id);
+    if (document.querySelector("dialog[open]")) return;
+    const opener = dialogOpeners.get(dialog.id);
+    if (opener?.isConnected && opener.getClientRects().length)
+      opener.focus({ preventScroll: true });
+    else $("main").focus({ preventScroll: true });
+  });
+});
+window.addEventListener("beforeunload", (event) => {
+  if ([...document.querySelectorAll("dialog[open]")].some(hasUnsavedChanges)) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+});
+function confirmAction(heading, message, label, action, requiredName = null) {
   $("confirmHeading").textContent = heading;
   $("confirmMessage").textContent = message;
   $("confirmAction").textContent = label;
-  $("confirmAction").onclick = () => {
-    if (action() !== false) $("confirmDialog").close();
+  $("confirmError").textContent = "";
+  $("deleteConfirmLabel").hidden = requiredName === null;
+  $("deleteConfirmName").value = "";
+  $("confirmAction").onclick = async () => {
+    if (
+      requiredName !== null &&
+      $("deleteConfirmName").value !== requiredName
+    ) {
+      $("confirmError").textContent =
+        `Type ${requiredName} exactly to confirm deletion.`;
+      $("deleteConfirmName").focus();
+      return;
+    }
+    $("confirmAction").disabled = true;
+    try {
+      if ((await action()) !== false) $("confirmDialog").close();
+    } finally {
+      $("confirmAction").disabled = false;
+    }
   };
   openDialog("confirmDialog");
 }
@@ -221,7 +407,7 @@ function renderOverview() {
     `${stale ? `<div class="notice">${stale} ${stale === 1 ? "note is" : "notes are"} due for a review. Check the details with the relevant person or provider.</div>` : ""}<div class="overview-layout"><div class="main-column"><section class="hero"><div class="hero-copy"><p class="eyebrow">START SMALL. MAKE IT USEFUL.</p><h2>${next ? "A little clarity for<br>life’s what-ifs." : "The next step?<br>Try it together."}</h2><p>${next ? "Who to call. Where to look. What to do next. Put the essentials in one thoughtful place." : "Your checklist is a starting point. Now check that someone else can use the handover."}</p><button class="button primary" ${next ? `data-essential="${next.id}"` : 'data-action="drill"'}>${next ? (state.records.length ? "Continue your setup" : "Start with the essentials") : "Practice the handover"} <span aria-hidden="true">→</span></button></div><div class="hero-art">${houseArt}</div></section>${essentialsMarkup()}</div><aside class="side-column" aria-label="Your next steps">${planMarkup()}<section class="note-card"><p class="eyebrow">THE BEST KIND OF BACKUP</p><h3>Someone who knows<br>where to look.</h3><p>Print a copy. Tell your trusted person where it lives. Try finding a few important details together.</p><a href="#handover" class="text-button">Make your handover useful ↗</a></section><p class="bottom-tip"><strong>New here?</strong> Explore a fictional household before you begin.<br><button class="text-button" data-action="demo">${demoMode ? "Return to your household" : "Take a look at an example"} ↗</button><br><button class="text-button" data-action="privacy">Privacy & storage details</button></p></aside></div>`;
 }
 function cardMarkup(r) {
-  return `<article class="panel record-card"><div><span class="pill ${A.status(r) === "reviewed" ? "green" : "orange"}">${esc(reviewLabel(r))}</span></div><h3>${esc(r.title)}</h3><p class="record-ref">${esc(r.ref)}</p><p class="record-notes">${esc(r.notes)}</p><div class="record-actions"><button class="text-button" data-edit="${r.id}">Edit note</button><button class="text-button" data-review="${r.id}">${A.status(r) === "reviewed" ? "Review again" : "Mark reviewed"}</button><button class="text-button danger" data-delete="${r.id}">Delete</button></div></article>`;
+  return `<article class="panel record-card"><div><span class="pill ${A.status(r) === "reviewed" ? "green" : "orange"}">${esc(reviewLabel(r))}</span></div><h3>${esc(r.title)}</h3>${r.legacyLabel ? `<p class="record-ref">Legacy label: ${esc(r.legacyLabel)}</p>` : ""}<p class="record-ref">${esc(r.ref)}</p><p class="record-notes">${esc(r.notes)}</p><div class="record-actions"><button class="text-button" data-edit="${r.id}">Edit note</button><button class="text-button" data-review="${r.id}">${A.status(r) === "reviewed" ? "Review again" : "Mark reviewed"}</button><button class="text-button danger" data-delete="${r.id}">Delete</button></div></article>`;
 }
 function renderSection(page) {
   const section = A.SECTIONS.find((s) => s.id === page),
@@ -244,6 +430,7 @@ function render() {
     section = A.SECTIONS.find((s) => s.id === page);
   $("householdName").textContent = state.familyName;
   $("demoBanner").hidden = !demoMode;
+  if (!editorOwner && !demoMode) warning(readOnlyMessage());
   $("saveStatus").textContent = demoMode
     ? "Example · changes are temporary"
     : corrupt || conflict
@@ -251,6 +438,8 @@ function render() {
       : lastStored
         ? "Saved on this browser"
         : "No notes saved yet";
+  if (!editorOwner && !demoMode)
+    $("saveStatus").textContent = "Read-only snapshot";
   $("breadcrumb").textContent =
     section?.name || (page === "handover" ? "Your handover" : "Overview");
   $("pageEyebrow").textContent =
@@ -273,11 +462,20 @@ function render() {
   if (page === "overview") renderOverview();
   else if (page === "handover") renderHandover();
   else renderSection(page);
+  if (!editorOwner && !demoMode) {
+    document
+      .querySelectorAll(
+        "[data-add],[data-edit],[data-review],[data-delete],[data-exclude],[data-essential],[data-action='profile'],[data-action='drill'],#profileBtn",
+      )
+      .forEach((button) => (button.disabled = true));
+  }
   // An unprepared browser print must not silently disclose every household note.
   $("printPacket").innerHTML =
     '<div class="packet-document"><h1>Create a handover first</h1><p>Return to Ark and choose Create handover. Select the notes you intend to print, then use Print / save PDF.</p></div>';
 }
-function openRecord(templateId = null, id = null, section = "people") {
+async function openRecord(templateId = null, id = null, section = "people") {
+  if (mutationPending) return;
+  if (!editorOwner && !demoMode) return toast(readOnlyMessage());
   const t = A.ESSENTIALS.find((t) => t.id === templateId),
     existing = id
       ? state.records.find((r) => r.id === id)
@@ -285,7 +483,7 @@ function openRecord(templateId = null, id = null, section = "people") {
   if (t && state.notApplicable.includes(t.id)) {
     const next = clone(state);
     next.notApplicable = next.notApplicable.filter((x) => x !== t.id);
-    if (!commit(next)) return;
+    if (!(await commit(next))) return;
   }
   $("recordForm").reset();
   $("recordError").textContent = "";
@@ -311,7 +509,7 @@ function openRecord(templateId = null, id = null, section = "people") {
   $("recordNotes").value = existing?.notes || "";
   openDialog("recordDialog");
 }
-$("recordForm").addEventListener("submit", (e) => {
+$("recordForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   $("recordError").textContent = "";
   const next = clone(state),
@@ -330,15 +528,19 @@ $("recordForm").addEventListener("submit", (e) => {
     reviewedAt: null,
   };
   const index = next.records.findIndex((r) => r.id === id);
+  if (index >= 0 && next.records[index].legacyLabel)
+    record.legacyLabel = next.records[index].legacyLabel;
   if (index < 0) next.records.push(record);
   else next.records[index] = record;
   next.notApplicable = next.notApplicable.filter((t) => t !== record.template);
-  if (commit(next, "recordError")) {
+  if (await commit(next, "recordError")) {
     $("recordDialog").close();
     toast("Note saved as a draft. Check the details, then mark it reviewed.");
   }
 });
 function openProfile() {
+  if (mutationPending) return;
+  if (!editorOwner && !demoMode) return toast(readOnlyMessage());
   $("profileError").textContent = "";
   $("profileName").value = state.familyName;
   $("profileRecipient").value = state.recipient;
@@ -346,14 +548,14 @@ function openProfile() {
   $("profileBackup").value = state.backupLocation;
   openDialog("profileDialog");
 }
-$("profileForm").addEventListener("submit", (e) => {
+$("profileForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const next = clone(state);
   next.familyName = $("profileName").value.trim();
   next.recipient = $("profileRecipient").value.trim();
   next.packetLocation = $("profileLocation").value.trim();
   next.backupLocation = $("profileBackup").value.trim();
-  if (commit(next, "profileError")) {
+  if (await commit(next, "profileError")) {
     $("profileDialog").close();
     toast("Handover plan saved.");
   }
@@ -361,6 +563,7 @@ $("profileForm").addEventListener("submit", (e) => {
 $("profileBtn").addEventListener("click", openProfile);
 $("privacyBtn").addEventListener("click", () => openDialog("privacyDialog"));
 function toggleDemo() {
+  if (mutationPending) return;
   if (!demoMode) {
     personalState = state;
     state = A.demo();
@@ -375,6 +578,7 @@ function toggleDemo() {
 }
 $("exitDemoBtn").addEventListener("click", toggleDemo);
 $("pageContent").addEventListener("click", (e) => {
+  if (mutationPending) return;
   const b = e.target.closest("button");
   if (!b) return;
   if (b.dataset.essential) return openRecord(b.dataset.essential);
@@ -388,18 +592,18 @@ $("pageContent").addEventListener("click", (e) => {
       () => {
         const next = clone(state);
         next.notApplicable.push(b.dataset.exclude);
-        return commit(next);
+        return commit(next, "confirmError");
       },
     );
   if (b.dataset.delete)
     return confirmAction(
       "Delete this note?",
-      "This removes the note from this browser copy. Previously downloaded backups and printed packets will still contain it.",
+      "This removes the note from the current copy. The previous browser recovery copy, older legacy records, downloaded backups, and printed packets may still contain it. Use Delete browser data to remove all Ark browser copies.",
       "Delete note",
       () => {
         const next = clone(state);
         next.records = next.records.filter((r) => r.id !== b.dataset.delete);
-        return commit(next);
+        return commit(next, "confirmError");
       },
     );
   if (b.dataset.review)
@@ -411,7 +615,7 @@ $("pageContent").addEventListener("click", (e) => {
         const next = clone(state);
         next.records.find((r) => r.id === b.dataset.review).reviewedAt =
           A.now();
-        return commit(next);
+        return commit(next, "confirmError");
       },
     );
   if (b.dataset.action === "profile") openProfile();
@@ -424,11 +628,11 @@ $("pageContent").addEventListener("click", (e) => {
     openDialog("drillDialog");
   }
 });
-$("drillForm").addEventListener("submit", (e) => {
+$("drillForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const next = clone(state);
   next.practicedAt = A.now();
-  if (commit(next, "drillError")) {
+  if (await commit(next, "drillError")) {
     $("drillDialog").close();
     toast("Practice recorded. Repeat after important household changes.");
   }
@@ -457,6 +661,10 @@ $("backupBtn").addEventListener("click", () => {
   $("importForm").reset();
   clearRestore();
   $("backupSuccess").textContent = "";
+  $("exportSubmit").disabled = false;
+  $("exportSubmit").disabled = !editorOwner;
+  $("confirmRestoreBtn").disabled = !editorOwner;
+  $("deleteHouseholdBtn").disabled = !editorOwner;
   openDialog("backupDialog");
 });
 $("exportForm").addEventListener("submit", async (e) => {
@@ -473,8 +681,22 @@ $("exportForm").addEventListener("submit", async (e) => {
     return;
   }
   $("exportSubmit").disabled = true;
+  const generation = ++exportGeneration;
   try {
-    const encrypted = await A.encrypt(clone(state), $("exportPassword").value);
+    requireEditor();
+    let snapshot, snapshotRaw;
+    await withWriteLock(() => {
+      ensureCurrentCopy();
+      snapshot = clone(state);
+      snapshotRaw = lastStored;
+    });
+    const encrypted = await A.encrypt(snapshot, $("exportPassword").value);
+    if (generation !== exportGeneration || !$("backupDialog").open) return;
+    ensureCurrentCopy();
+    if (snapshotRaw !== lastStored)
+      throw new Error(
+        "The household changed while the backup was being prepared. Download a new backup.",
+      );
     download(
       JSON.stringify(encrypted, null, 2),
       `ark-backup-${new Date().toISOString().slice(0, 10)}.json`,
@@ -483,9 +705,11 @@ $("exportForm").addEventListener("submit", async (e) => {
     $("backupSuccess").textContent =
       "Encrypted file prepared for download. Confirm it is saved, store it separately, and test restoring it. The passphrase is not saved by Ark.";
   } catch (error) {
-    $("backupError").textContent = error.message;
+    if (generation === exportGeneration)
+      $("backupError").textContent = error.message;
   } finally {
-    $("exportSubmit").disabled = false;
+    if (generation === exportGeneration)
+      $("exportSubmit").disabled = !editorOwner;
   }
 });
 $("importFile").addEventListener("change", clearRestore);
@@ -499,7 +723,7 @@ $("importForm").addEventListener("submit", async (e) => {
   try {
     const file = $("importFile").files[0];
     if (!file || file.size > A.MAX_BYTES)
-      throw new Error("Choose an Ark backup smaller than 5 MB.");
+      throw new Error("Choose an Ark backup no larger than 32 MB.");
     const restored = await A.decode(
       await file.text(),
       $("importPassword").value,
@@ -518,9 +742,9 @@ $("importForm").addEventListener("submit", async (e) => {
   }
 });
 $("cancelRestoreBtn").addEventListener("click", clearRestore);
-$("confirmRestoreBtn").addEventListener("click", () => {
+$("confirmRestoreBtn").addEventListener("click", async () => {
   if (!pendingRestore) return;
-  if (commit(clone(pendingRestore), "backupError", true)) {
+  if (await commit(clone(pendingRestore), "backupError", true)) {
     clearRestore();
     $("importForm").reset();
     $("backupSuccess").textContent =
@@ -528,9 +752,76 @@ $("confirmRestoreBtn").addEventListener("click", () => {
   }
 });
 $("backupDialog").addEventListener("close", () => {
+  exportGeneration++;
+  $("exportSubmit").disabled = false;
   clearRestore();
   $("exportForm").reset();
   $("importForm").reset();
+});
+$("recoverPreviousBtn").addEventListener("click", async () => {
+  clearRestore();
+  const generation = restoreGeneration;
+  $("backupSuccess").textContent = "";
+  try {
+    let previous;
+    await withWriteLock(() => {
+      ensureCurrentCopy();
+      previous = localStorage.getItem(A.RECOVERY_KEY);
+    });
+    if (generation !== restoreGeneration || !$("backupDialog").open) return;
+    if (!previous)
+      throw new Error(
+        "No previous browser copy is available yet. Restore a downloaded backup instead.",
+      );
+    pendingRestore = A.validate(JSON.parse(previous));
+    $("restoreSummary").textContent =
+      `Previous copy: ${pendingRestore.familyName} · ${pendingRestore.records.length} notes · ${formatDate(pendingRestore.updatedAt)}. Replacing will keep the current copy as the next recovery copy.`;
+    $("restorePreview").hidden = false;
+    $("confirmRestoreBtn").focus();
+  } catch (error) {
+    if (generation === restoreGeneration)
+      $("backupError").textContent = error.message;
+  }
+});
+$("deleteHouseholdBtn").addEventListener("click", () => {
+  confirmAction(
+    "Delete Ark data from this browser?",
+    `This permanently removes the current household, previous-copy recovery, and older Ark records from this browser profile. Downloaded backups, printouts, and other browsers are unchanged. Download a backup first if needed. Type “${state.familyName}” to confirm.`,
+    "Delete browser data",
+    async () => {
+      setMutationBusy(true);
+      try {
+        requireEditor();
+        await withWriteLock(() => {
+          ensureCurrentCopy();
+          localStorage.removeItem(A.LEGACY_KEY);
+          localStorage.removeItem(A.RECOVERY_KEY);
+          localStorage.removeItem(A.STORAGE_KEY);
+        });
+        lastStored = null;
+        corrupt = false;
+        conflict = false;
+        state = A.blank();
+        warning("");
+        clearRestore();
+        $("backupDialog").close();
+        render();
+        toast(
+          "Ark data was removed from this browser. Separate files and other browsers are unchanged.",
+        );
+        return true;
+      } catch (error) {
+        conflict = true;
+        $("confirmError").textContent =
+          "Deletion could not be completed. Reload Ark and check the browser copy before trying again. " +
+          error.message;
+        return false;
+      } finally {
+        setMutationBusy(false);
+      }
+    },
+    state.familyName,
+  );
 });
 let packetPreset = "family";
 function selectedIds() {
@@ -551,7 +842,7 @@ function buildPacket(ids, includePlan, title) {
     (s) => {
       const records = selected.filter((r) => r.section === s.id);
       return records.length
-        ? `<section><h2>${s.name}</h2>${records.map((r) => `<article><h3>${esc(r.title)}</h3><p class="packet-meta">${esc(reviewLabel(r))}</p>${r.ref ? `<p><strong>Contact / location:</strong> ${esc(r.ref)}</p>` : ""}<p>${esc(r.notes)}</p></article>`).join("")}</section>`
+        ? `<section><h2>${s.name}</h2>${records.map((r) => `<article><h3>${esc(r.title)}</h3>${r.legacyLabel ? `<p>Legacy label: ${esc(r.legacyLabel)}</p>` : ""}<p class="packet-meta">${esc(reviewLabel(r))}</p>${r.ref ? `<p><strong>Contact / location:</strong> ${esc(r.ref)}</p>` : ""}<p>${esc(r.notes)}</p></article>`).join("")}</section>`
         : "";
     },
   ).join(
@@ -625,13 +916,22 @@ window.addEventListener("storage", (e) => {
   if (e.key === A.STORAGE_KEY || e.key === null) {
     conflict = true;
     warning(
-      "Another tab changed or cleared this household. Reload Ark before saving to avoid overwriting that copy.",
+      editorOwner
+        ? "Another tab changed or cleared this household. Reload Ark before saving to avoid overwriting that copy."
+        : readOnlyMessage(),
     );
-    $("saveStatus").textContent = "Another tab changed this copy";
+    $("saveStatus").textContent = editorOwner
+      ? "Another tab changed this copy"
+      : "Read-only snapshot";
   }
 });
 window.addEventListener("pageshow", (e) => {
-  if (e.persisted) render();
+  if (e.persisted) location.reload();
 });
-load();
-render();
+window.addEventListener("pagehide", () => {
+  editorOwner = false;
+  releaseEditor?.();
+  releaseEditor = null;
+});
+if ($("appVersion")) $("appVersion").textContent = A.APP_VERSION;
+claimEditorSession().then(load).then(render);

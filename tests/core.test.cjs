@@ -159,7 +159,7 @@ test("wrong passphrase and tampered ciphertext fail authenticated decryption", a
 });
 test("malformed imports and untrusted KDF parameters fail without processing", async () => {
   await assert.rejects(A.decode("not json"), /valid JSON/);
-  await assert.rejects(A.decode("x".repeat(A.MAX_BYTES + 1)), /5 MB/);
+  await assert.rejects(A.decode("x".repeat(A.MAX_BYTES + 1)), /32 MB/);
   await assert.rejects(
     A.decode(
       JSON.stringify({ format: "ark-encrypted", version: 1, iterations: 1 }),
@@ -179,4 +179,114 @@ test("example records are valid and created independently", () => {
   assert.equal(A.validate(d).records.length, 7);
   d.familyName = "changed";
   assert.notEqual(A.demo().familyName, d.familyName);
+});
+
+test("every maximum-size legal backup remains importable, including JSON escaping", async () => {
+  const s = A.blank(),
+    time = A.now();
+  s.records = Array.from({ length: 500 }, (_, i) => ({
+    id: `max-${i}`,
+    template: null,
+    section: "care",
+    title: "t".repeat(120),
+    ref: "r".repeat(300),
+    notes: "\u0001".repeat(4000),
+    updatedAt: time,
+    reviewedAt: null,
+  }));
+  const file = await A.encrypt(s, "large backup fictional phrase");
+  const raw = JSON.stringify(file, null, 2);
+  assert.ok(Buffer.byteLength(raw) < A.MAX_BYTES);
+  assert.deepEqual(await A.decode(raw, "large backup fictional phrase"), s);
+});
+
+test("migration retains legacy labels and splits long care instructions without truncation", () => {
+  const old = {
+    familyName: "Legacy",
+    urgent: [
+      {
+        title: "Contact",
+        badge: "CALL SECOND AFTER SPOUSE",
+        ref: "555",
+        notes: "Call",
+      },
+    ],
+    finance: [],
+    home: [],
+    parents: [],
+    sitter: {
+      kids: "k".repeat(3000),
+      allergies: "a".repeat(3000),
+      contacts: "c".repeat(3000),
+      house: "h".repeat(3000),
+    },
+  };
+  const s = A.migrateLegacy(old);
+  assert.equal(s.records[0].legacyLabel, old.urgent[0].badge);
+  const recovered = s.records
+    .filter((r) => r.id.startsWith("legacy-sitter"))
+    .map((r) => r.notes)
+    .join("");
+  assert.equal(
+    recovered,
+    "KIDS\n" +
+      old.sitter.kids +
+      "\n\nALLERGIES\n" +
+      old.sitter.allergies +
+      "\n\nCONTACTS\n" +
+      old.sitter.contacts +
+      "\n\nHOUSE\n" +
+      old.sitter.house,
+  );
+});
+
+test("release metadata agrees with the running application", () => {
+  assert.equal(A.APP_VERSION, require("../package.json").version);
+});
+
+test("optional recovery failure does not prevent a normal save", () => {
+  const initial = A.blank(),
+    updated = { ...initial, familyName: "Changed" },
+    values = new Map([[A.STORAGE_KEY, JSON.stringify(initial)]]);
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem(key, value) {
+      if (key === A.RECOVERY_KEY)
+        throw new DOMException("Full", "QuotaExceededError");
+      values.set(key, value);
+    },
+    removeItem: (key) => values.delete(key),
+  };
+  const result = A.persistWithRecovery(
+    storage,
+    updated,
+    JSON.stringify(initial),
+  );
+  assert.equal(result.recoverySaved, false);
+  assert.equal(JSON.parse(values.get(A.STORAGE_KEY)).familyName, "Changed");
+});
+
+test("quota consumed by a duplicate snapshot is released before retrying the save", () => {
+  const initial = A.blank(),
+    older = { ...initial, familyName: "Older" },
+    updated = { ...initial, familyName: "Changed" };
+  const previous = JSON.stringify(initial),
+    olderRaw = JSON.stringify(older),
+    values = new Map([
+      [A.STORAGE_KEY, previous],
+      [A.RECOVERY_KEY, olderRaw],
+    ]);
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem(key, value) {
+      if (key === A.STORAGE_KEY && values.get(A.RECOVERY_KEY) === previous)
+        throw new DOMException("Full", "QuotaExceededError");
+      values.set(key, value);
+    },
+    removeItem: (key) => values.delete(key),
+  };
+  const result = A.persistWithRecovery(storage, updated, previous);
+  assert.equal(result.recoverySaved, false);
+  assert.equal(values.get(A.RECOVERY_KEY), olderRaw);
+  assert.equal(JSON.parse(values.get(A.STORAGE_KEY)).familyName, "Changed");
 });

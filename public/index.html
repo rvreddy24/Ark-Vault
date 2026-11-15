@@ -27,7 +27,13 @@
           ><span>ark<span class="brand-dot">.</span></span></a
         >
         <div class="workspace-label">YOUR HOUSEHOLD WORKSPACE</div>
-        <button class="household-switch" id="profileBtn">
+        <button
+          class="household-switch"
+          id="profileBtn"
+          aria-label="Edit household and handover plan"
+          aria-haspopup="dialog"
+          aria-controls="profileDialog"
+        >
           <span class="avatar" aria-hidden="true">⌂</span
           ><span
             ><strong id="householdName">My household</strong
@@ -55,8 +61,13 @@
           <div class="topbar-actions">
             <span class="save-status" id="saveStatus" role="status"
               >Saved on this browser</span
-            ><button class="button secondary small" id="backupBtn">
-              ↥ &nbsp; Backup & restore
+            ><button
+              class="button secondary small"
+              id="backupBtn"
+              aria-haspopup="dialog"
+              aria-controls="backupDialog"
+            >
+              <span aria-hidden="true">↥</span> Backup & restore
             </button>
           </div>
         </header>
@@ -86,8 +97,13 @@
                 there.
               </p>
             </div>
-            <button class="button primary" id="printBtn">
-              ▤ &nbsp; Create handover
+            <button
+              class="button primary"
+              id="printBtn"
+              aria-haspopup="dialog"
+              aria-controls="packetDialog"
+            >
+              <span aria-hidden="true">▤</span> Create handover
             </button>
           </div>
           <div id="pageContent"></div>
@@ -103,7 +119,12 @@
       class="print-only"
       aria-label="Handover packet"
     ></section>
-    <dialog id="recordDialog" aria-labelledby="recordHeading">
+    <dialog
+      id="recordDialog"
+      class="dialog-frame"
+      aria-labelledby="recordHeading"
+      aria-describedby="recordPrompt"
+    >
       <form id="recordForm">
         <div class="dialog-heading">
           <div>
@@ -119,39 +140,43 @@
             ×
           </button>
         </div>
-        <p class="help" id="recordPrompt"></p>
-        <input type="hidden" id="recordId" /><input
-          type="hidden"
-          id="recordTemplate"
-        />
-        <label>Section<select id="recordSection"></select></label
-        ><label
-          >Title<input
-            id="recordTitle"
-            required
-            maxlength="120"
-            autocomplete="off"
-        /></label>
-        <label
-          >Contact or location<input
-            id="recordRef"
-            maxlength="300"
-            autocomplete="off"
-        /></label>
-        <label
-          >What should they know?<textarea
-            id="recordNotes"
-            rows="5"
-            maxlength="4000"
-            placeholder="Where to look, who to call, and the next practical step."
-          ></textarea>
-        </label>
-        <p class="field-note">
-          Keep passwords, PINs, full identity numbers, and safe combinations in
-          a suitable secure place. Record how an authorized person can find
-          them.
-        </p>
         <p class="form-error" id="recordError" role="alert"></p>
+        <div class="dialog-body">
+          <p class="help" id="recordPrompt"></p>
+          <input type="hidden" id="recordId" /><input
+            type="hidden"
+            id="recordTemplate"
+          />
+          <label>Section<select id="recordSection"></select></label
+          ><label
+            >Title<input
+              id="recordTitle"
+              required
+              maxlength="120"
+              autocomplete="off"
+          /></label>
+          <label
+            >Contact or location<input
+              id="recordRef"
+              aria-describedby="recordStorageHint"
+              maxlength="300"
+              autocomplete="off"
+          /></label>
+          <label
+            >What should they know?<textarea
+              id="recordNotes"
+              aria-describedby="recordStorageHint"
+              rows="5"
+              maxlength="4000"
+              placeholder="Where to look, who to call, and the next practical step."
+            ></textarea>
+          </label>
+          <p class="field-note" id="recordStorageHint">
+            Keep passwords, PINs, full identity numbers, and safe combinations
+            in a suitable secure place. Record how an authorized person can find
+            them.
+          </p>
+        </div>
         <div class="dialog-actions">
           <button class="button secondary" type="button" data-close>
             Cancel</button
@@ -159,7 +184,11 @@
         </div>
       </form>
     </dialog>
-    <dialog id="profileDialog" aria-labelledby="profileHeading">
+    <dialog
+      id="profileDialog"
+      class="dialog-frame"
+      aria-labelledby="profileHeading"
+    >
       <form id="profileForm">
         <div class="dialog-heading">
           <div>
@@ -175,36 +204,38 @@
             ×
           </button>
         </div>
-        <p class="help">
-          A packet is useful only when someone knows where to find it.
-        </p>
-        <label
-          >Household name<input
-            id="profileName"
-            maxlength="80"
-            required /></label
-        ><label
-          >Who should use this?<input
-            id="profileRecipient"
-            maxlength="160"
-            placeholder="e.g. Jamie, my partner"
-        /></label>
-        <label
-          >Where will the printed packet be?<input
-            id="profileLocation"
-            maxlength="300"
-            placeholder="e.g. Blue folder in the study" /></label
-        ><label
-          >Where will the backup be?<input
-            id="profileBackup"
-            maxlength="300"
-            placeholder="e.g. USB with our important papers"
-        /></label>
-        <p class="field-note">
-          Tell this person how to access the packet. Keep the backup passphrase
-          somewhere they can find independently.
-        </p>
         <p class="form-error" id="profileError" role="alert"></p>
+        <div class="dialog-body">
+          <p class="help">
+            A packet is useful only when someone knows where to find it.
+          </p>
+          <label
+            >Household name<input
+              id="profileName"
+              maxlength="80"
+              required /></label
+          ><label
+            >Who should use this?<input
+              id="profileRecipient"
+              maxlength="160"
+              placeholder="e.g. Jamie, my partner"
+          /></label>
+          <label
+            >Where will the printed packet be?<input
+              id="profileLocation"
+              maxlength="300"
+              placeholder="e.g. Blue folder in the study" /></label
+          ><label
+            >Where will the backup be?<input
+              id="profileBackup"
+              maxlength="300"
+              placeholder="e.g. USB with our important papers"
+          /></label>
+          <p class="field-note">
+            Tell this person how to access the packet. Keep the backup
+            passphrase somewhere they can find independently.
+          </p>
+        </div>
         <div class="dialog-actions">
           <button class="button secondary" type="button" data-close>
             Cancel</button
@@ -212,7 +243,11 @@
         </div>
       </form>
     </dialog>
-    <dialog id="backupDialog" aria-labelledby="backupHeading">
+    <dialog
+      id="backupDialog"
+      class="dialog-frame"
+      aria-labelledby="backupHeading"
+    >
       <div class="dialog-heading">
         <div>
           <p class="eyebrow">KEEP ANOTHER COPY</p>
@@ -222,78 +257,107 @@
           ×
         </button>
       </div>
-      <p class="help">
-        Browser data can be cleared or lost. Download a backup after important
-        changes and test it on another browser.
-      </p>
-      <form id="exportForm" class="sub-panel">
-        <h3>Download an encrypted backup</h3>
-        <p>
-          Only the backup file is encrypted. Your working browser copy is not.
-          We cannot recover a forgotten passphrase.
-        </p>
-        <label
-          >New backup passphrase<input
-            type="password"
-            id="exportPassword"
-            minlength="12"
-            maxlength="256"
-            required
-            autocomplete="new-password"
-            placeholder="At least 12 characters" /></label
-        ><label
-          >Repeat passphrase<input
-            type="password"
-            id="exportConfirm"
-            maxlength="256"
-            required
-            autocomplete="new-password" /></label
-        ><button class="button primary full" id="exportSubmit">
-          Encrypt & download
-        </button>
-      </form>
-      <form id="importForm" class="sub-panel">
-        <h3>Restore an existing backup</h3>
-        <p>
-          Encrypted Ark backups and older, unencrypted Ark JSON files are
-          supported. Review the file before replacing anything.
-        </p>
-        <label
-          >Backup file<input
-            type="file"
-            id="importFile"
-            accept=".json,application/json"
-            required /></label
-        ><label
-          >Backup passphrase <span class="optional">if encrypted</span
-          ><input
-            type="password"
-            id="importPassword"
-            maxlength="256"
-            autocomplete="off" /></label
-        ><button class="button secondary full" id="importSubmit">
-          Check backup
-        </button>
-      </form>
-      <div id="restorePreview" class="restore-preview" hidden>
-        <h3>Ready to restore</h3>
-        <p id="restoreSummary"></p>
-        <p>
-          Your current browser copy will be replaced. Download a backup first if
-          you need to keep it.
-        </p>
-        <button id="confirmRestoreBtn" class="button primary">
-          Replace with this backup</button
-        ><button id="cancelRestoreBtn" class="text-button">
-          Cancel restore
-        </button>
-      </div>
       <p class="form-error" id="backupError" role="alert"></p>
       <p class="success-message" id="backupSuccess" role="status"></p>
+      <div class="dialog-body">
+        <p class="help">
+          Browser data can be cleared or lost. Download a backup after important
+          changes and test it on another browser.
+        </p>
+        <form id="exportForm" class="sub-panel">
+          <h3>Download an encrypted backup</h3>
+          <p id="exportHint">
+            Only the backup file is encrypted. Your working browser copy is not.
+            We cannot recover a forgotten passphrase.
+          </p>
+          <label
+            >New backup passphrase<input
+              type="password"
+              id="exportPassword"
+              aria-describedby="exportHint"
+              minlength="12"
+              maxlength="256"
+              required
+              autocomplete="new-password"
+              placeholder="At least 12 characters" /></label
+          ><label
+            >Repeat passphrase<input
+              type="password"
+              id="exportConfirm"
+              maxlength="256"
+              required
+              autocomplete="new-password" /></label
+          ><button class="button primary full" id="exportSubmit">
+            Encrypt & download
+          </button>
+        </form>
+        <form id="importForm" class="sub-panel">
+          <h3>Restore an existing backup</h3>
+          <p>
+            Encrypted Ark backups and older, unencrypted Ark JSON files are
+            supported. Review the file before replacing anything.
+          </p>
+          <label
+            >Backup file<input
+              type="file"
+              id="importFile"
+              accept=".json,application/json"
+              required /></label
+          ><label
+            >Backup passphrase <span class="optional">if encrypted</span
+            ><input
+              type="password"
+              id="importPassword"
+              maxlength="256"
+              autocomplete="off" /></label
+          ><button class="button secondary full" id="importSubmit">
+            Check backup
+          </button>
+        </form>
+        <div id="restorePreview" class="restore-preview" hidden>
+          <h3>Ready to restore</h3>
+          <p id="restoreSummary"></p>
+          <p>
+            Your current browser copy will be replaced. Download a backup first
+            if you need to keep it.
+          </p>
+          <button id="confirmRestoreBtn" class="button primary">
+            Replace with this backup</button
+          ><button id="cancelRestoreBtn" class="text-button">
+            Cancel restore
+          </button>
+        </div>
+        <section class="sub-panel" aria-labelledby="browserCopyHeading">
+          <h3 id="browserCopyHeading">This browser copy</h3>
+          <p>
+            Ark can keep an automatic previous copy on this device for recovery.
+            This recovery copy is local and unencrypted, just like your working
+            notes.
+          </p>
+          <button
+            type="button"
+            class="button secondary full"
+            id="recoverPreviousBtn"
+          >
+            Recover previous copy
+          </button>
+          <p>
+            Deleting browser data removes Ark’s local copies from this browser.
+            It does not remove downloaded backups, PDFs, or printed packets.
+          </p>
+          <button
+            type="button"
+            class="button secondary full danger"
+            id="deleteHouseholdBtn"
+          >
+            Delete browser data
+          </button>
+        </section>
+      </div>
     </dialog>
     <dialog
       id="packetDialog"
-      class="wide-dialog"
+      class="wide-dialog dialog-frame"
       aria-labelledby="packetHeading"
     >
       <div class="dialog-heading">
@@ -305,24 +369,26 @@
           ×
         </button>
       </div>
-      <p class="help">
-        Choose a starting point, then check exactly what you want to include.
-        Printed and copied information is unencrypted and cannot be revoked.
-      </p>
-      <div class="packet-presets" role="group" aria-label="Packet presets">
-        <button class="button secondary" data-preset="family">
-          Family handover</button
-        ><button class="button secondary" data-preset="care">
-          Caregiver briefing
-        </button>
-      </div>
-      <div id="packetSelection" class="packet-selection"></div>
-      <label class="check-label"
-        ><input type="checkbox" id="includePlan" checked /> Include household
-        handover locations and practice date</label
-      >
-      <div class="packet-preview" id="packetPreview"></div>
       <p class="form-error" id="packetError" role="alert"></p>
+      <div class="dialog-body">
+        <p class="help">
+          Choose a starting point, then check exactly what you want to include.
+          Printed and copied information is unencrypted and cannot be revoked.
+        </p>
+        <div class="packet-presets" role="group" aria-label="Packet presets">
+          <button class="button secondary" data-preset="family">
+            Family handover</button
+          ><button class="button secondary" data-preset="care">
+            Caregiver briefing
+          </button>
+        </div>
+        <div id="packetSelection" class="packet-selection"></div>
+        <label class="check-label"
+          ><input type="checkbox" id="includePlan" checked /> Include household
+          handover locations and practice date</label
+        >
+        <div class="packet-preview" id="packetPreview"></div>
+      </div>
       <div class="dialog-actions">
         <button class="button secondary" id="copyPacketBtn">Copy text</button
         ><button class="button primary" id="printPacketBtn">
@@ -330,7 +396,11 @@
         </button>
       </div>
     </dialog>
-    <dialog id="privacyDialog" aria-labelledby="privacyHeading">
+    <dialog
+      id="privacyDialog"
+      class="dialog-frame"
+      aria-labelledby="privacyHeading"
+    >
       <div class="dialog-heading">
         <div>
           <p class="eyebrow">PRIVACY, IN PLAIN WORDS</p>
@@ -344,7 +414,7 @@
           ×
         </button>
       </div>
-      <div class="prose">
+      <div class="prose dialog-body">
         <p>
           Ark has no accounts, analytics, external fonts, cloud sync, or remote
           scripts. The application makes no outbound network requests.
@@ -377,6 +447,22 @@
           instructions with a qualified professional. If there is immediate
           danger, contact local emergency services.
         </p>
+        <h3>Support &amp; product version</h3>
+        <p>
+          Ark local edition <span id="appVersion"></span>. Report a software
+          problem through
+          <a
+            href="https://github.com/rvreddy24/Ark-Vault/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub Issues (opens in a new tab)</a
+          >. Opening this link connects to GitHub.
+        </p>
+        <p>
+          Never attach household notes, backup files, passphrases, or other
+          personal information to a support request. Describe the steps and
+          browser version using fictional examples.
+        </p>
       </div>
       <button class="button secondary full" data-close>Got it</button>
     </dialog>
@@ -388,12 +474,21 @@
         </button>
       </div>
       <p id="confirmMessage" class="help"></p>
+      <label id="deleteConfirmLabel" hidden
+        >Type your household name
+        <input id="deleteConfirmName" maxlength="80" autocomplete="off" />
+      </label>
+      <p id="confirmError" class="form-error" role="alert"></p>
       <div class="dialog-actions">
         <button class="button secondary" data-close>Cancel</button
         ><button class="button primary" id="confirmAction">Confirm</button>
       </div>
     </dialog>
-    <dialog id="drillDialog" aria-labelledby="drillHeading">
+    <dialog
+      id="drillDialog"
+      class="dialog-frame"
+      aria-labelledby="drillHeading"
+    >
       <form id="drillForm">
         <div class="dialog-heading">
           <div>
@@ -409,21 +504,23 @@
             ×
           </button>
         </div>
-        <p class="help">
-          Ask your trusted person to do these without your help. Record the
-          practice only after you have tried it together.
-        </p>
-        <label class="check-label"
-          ><input type="checkbox" required /> They found the printed packet and
-          know when it was updated.</label
-        ><label class="check-label"
-          ><input type="checkbox" required /> They found the first contact, bill
-          instructions, and important document locations.</label
-        ><label class="check-label"
-          ><input type="checkbox" required /> We restored a backup in another
-          browser and confirmed the notes were there.</label
-        >
         <p class="form-error" id="drillError" role="alert"></p>
+        <div class="dialog-body">
+          <p class="help">
+            Ask your trusted person to do these without your help. Record the
+            practice only after you have tried it together.
+          </p>
+          <label class="check-label"
+            ><input type="checkbox" required /> They found the printed packet
+            and know when it was updated.</label
+          ><label class="check-label"
+            ><input type="checkbox" required /> They found the first contact,
+            bill instructions, and important document locations.</label
+          ><label class="check-label"
+            ><input type="checkbox" required /> We restored a backup in another
+            browser and confirmed the notes were there.</label
+          >
+        </div>
         <div class="dialog-actions">
           <button class="button secondary" type="button" data-close>
             Later</button
