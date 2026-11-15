@@ -1,63 +1,38 @@
-"""
-Ark Vault — Digital Download Release Packager
-Generates a clean, customer-ready ZIP bundle for Gumroad, Etsy, Lemon Squeezy, or Shopify.
-"""
+"""Build the customer download from an explicit allowlist."""
+from pathlib import Path
+from zipfile import ZipFile, ZIP_DEFLATED, ZipInfo
 
-import os
-import zipfile
-import datetime
+ROOT = Path(__file__).resolve().parent
+DIST_NAME = 'Ark-Family-OS-Digital-Edition'
+OUTPUT = ROOT / f'{DIST_NAME}.zip'
+FILES = ['Start-Ark.bat', 'Start-Ark.command', 'README_START_HERE.txt',
+         'PRINTABLE_EMERGENCY_RUNBOOK_CHECKLIST.md', 'PRIVACY_AND_SECURITY.md',
+         'server.py', 'public/index.html', 'public/style.css', 'public/core.js',
+         'public/app.js', 'public/icon.svg']
 
-DIST_NAME = "Ark-Family-OS-Digital-Edition"
-VAULT_ROOT = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_ZIP = os.path.join(VAULT_ROOT, f"{DIST_NAME}.zip")
-
-# Customer-facing deliverables to include in the ZIP package
-INCLUDED_FILES = [
-    "Start-Ark.bat",
-    "Start-Ark.command",
-    "README_START_HERE.txt",
-    "PRINTABLE_EMERGENCY_RUNBOOK_CHECKLIST.md",
-    "server.py",
-]
-
-INCLUDED_DIRS = [
-    "public"
-]
+def release_bytes(name):
+    content = (ROOT / name).read_bytes()
+    # Launchers must work regardless of the packager host's checkout settings.
+    if name.endswith('.bat'):
+        return content.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+    if name.endswith('.command'):
+        return content.replace(b'\r\n', b'\n')
+    return content
 
 def create_package():
-    print(f"📦 Packaging Ark Vault Digital Edition into: {OUTPUT_ZIP}")
-    
-    if os.path.exists(OUTPUT_ZIP):
-        os.remove(OUTPUT_ZIP)
-
-    with zipfile.ZipFile(OUTPUT_ZIP, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        # Add root files
-        for fname in INCLUDED_FILES:
-            fpath = os.path.join(VAULT_ROOT, fname)
-            if os.path.exists(fpath):
-                arcname = os.path.join(DIST_NAME, fname)
-                zipf.write(fpath, arcname)
-                print(f"  + Added: {fname}")
-            else:
-                print(f"  [!] Missing file: {fname}")
-
-        # Add directories
-        for dname in INCLUDED_DIRS:
-            dpath = os.path.join(VAULT_ROOT, dname)
-            if os.path.exists(dpath):
-                for root, _, files in os.walk(dpath):
-                    for file in files:
-                        full_path = os.path.join(root, file)
-                        rel_path = os.path.relpath(full_path, VAULT_ROOT)
-                        arcname = os.path.join(DIST_NAME, rel_path)
-                        zipf.write(full_path, arcname)
-                        print(f"  + Added: {rel_path}")
-
-    size_kb = os.path.getsize(OUTPUT_ZIP) / 1024
-    print(f"\n✅ Build Complete! Package created successfully:")
-    print(f"   File: {OUTPUT_ZIP}")
-    print(f"   Size: {size_kb:.1f} KB")
-    print(f"   Ready to upload to Gumroad / Etsy / Lemon Squeezy.")
+    for name in FILES:
+        if not (ROOT / name).is_file():
+            raise FileNotFoundError(name)
+    temporary = OUTPUT.with_suffix('.zip.tmp')
+    with ZipFile(temporary, 'w', ZIP_DEFLATED) as archive:
+        for name in FILES:
+            info = ZipInfo(f'{DIST_NAME}/{name}', date_time=(2026, 11, 15, 0, 0, 0))
+            info.compress_type = ZIP_DEFLATED
+            info.create_system = 3
+            info.external_attr = (0o100755 if name.endswith('.command') else 0o100644) << 16
+            archive.writestr(info, release_bytes(name))
+    temporary.replace(OUTPUT)
+    print(f'Built {OUTPUT.name}: {OUTPUT.stat().st_size:,} bytes, {len(FILES)} files.')
 
 if __name__ == '__main__':
     create_package()

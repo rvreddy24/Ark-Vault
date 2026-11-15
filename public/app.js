@@ -1,904 +1,637 @@
-// Ark Vault • Digital Edition • Robust & Polished LocalStorage Engine
-
-const STORAGE_KEY = 'ark_vault_data_clean_v3';
-const THEME_KEY = 'ark_theme';
-
-// Clean Blank Default Dataset (Zero Preloaded Data)
-const BLANK_VAULT_DATA = {
-  familyName: "My Family Vault",
-  urgent: [],
-  finance: [],
-  home: [],
-  parents: [],
-  sitter: {
-    kids: "",
-    allergies: "",
-    contacts: "",
-    house: ""
-  }
-};
-
-// Optional Demo Dataset (Only loaded if user clicks "Load Demo Example Records")
-const SAMPLE_VAULT_DATA = {
-  familyName: "The Miller Family",
-  urgent: [
-    {
-      id: "urg-1",
-      badge: "CALL FIRST",
-      title: "Dr. Sarah Miller (Sister)",
-      ref: "(555) 234-8901",
-      notes: "🔑 Has Spare Key: Master Safe #2\n⚖️ Legal Role: Alternate Co-Trustee",
-      verified: true
-    },
-    {
-      id: "urg-2",
-      badge: "IMMEDIATE CASH",
-      title: "$3,500 Cash Reserve",
-      ref: "Master Bedroom Walk-in Closet",
-      notes: "🔒 Safe Combination: 32 - 14 - 88\n💳 Joint Chase Card: In wallet (*4821)",
-      verified: true
-    },
-    {
-      id: "urg-3",
-      badge: "WORK BENEFITS",
-      title: "Apex Global HR Benefits",
-      ref: "(800) 555-0199",
-      notes: "💰 Group Policy: 2x Base Salary ($350,000)\n👤 Beneficiary: Spouse (100%)\n✉️ HR Email: benefits@apex.com",
-      verified: true
-    }
-  ],
-  finance: [
-    {
-      id: "fin-1",
-      badge: "LIFE POLICY #1",
-      title: "Northwestern Mutual ($1,000,000)",
-      ref: "Policy #: NM-7749201-TL",
-      notes: "📞 Claims Phone: (800) 388-8123\n👤 Agent: Mark Henderson\n⏱️ Payout Time: 5-7 business days",
-      verified: true
-    },
-    {
-      id: "fin-2",
-      badge: "MORTGAGE",
-      title: "Wells Fargo Home Mortgage ($3,140/mo)",
-      ref: "Loan #: WF-992140-5",
-      notes: "🗓️ Draft Date: 1st of month\n🏦 Paid From: Chase Checking (*4821)\n⚠️ Keep account funded!",
-      verified: true
-    },
-    {
-      id: "fin-3",
-      badge: "PASSWORDS",
-      title: "1Password Master Vault",
-      ref: "All household logins & 2FA",
-      notes: "📄 Emergency Sheet: Inside Master Safe\n🍎 Apple ID: Spouse set as Legacy Contact\n🔑 Secret Key: 34-character code in sheet",
-      verified: true
-    }
-  ],
-  home: [
-    {
-      id: "home-1",
-      badge: "MAIN WATER",
-      title: "Main Water Shutoff Valve",
-      ref: "Basement north wall, behind water heater",
-      notes: "Turn the yellow brass lever 90 degrees clockwise to stop whole-house flooding.",
-      verified: true
-    },
-    {
-      id: "home-2",
-      badge: "ELECTRICAL",
-      title: "Electrical Breaker Box",
-      ref: "Garage wall next to interior entry door",
-      notes: "Square D 200A panel. Fully labeled switches for all circuits and furnace.",
-      verified: true
-    },
-    {
-      id: "home-3",
-      badge: "HVAC SPECS",
-      title: "HVAC Air Filter Size",
-      ref: "16 x 25 x 1 (MERV 11)",
-      notes: "Spares stored on garage top shelf. Replace every 90 days. Filter arrow points toward blower.",
-      verified: true
-    }
-  ],
-  parents: [
-    {
-      id: "par-1",
-      badge: "AGING PARENT",
-      title: "Robert Miller (Dad • Age 74)",
-      ref: "Portland, OR • Living Independently",
-      notes: "✓ DPOA Active\nMedicare: Part A/B # 4TE2-MK8-901\nCardiologist: Dr. Thorne (503) 555-4301\nDaily Meds: Metoprolol (AM), Atorvastatin (PM)",
-      verified: true
-    },
-    {
-      id: "par-2",
-      badge: "FRAUD SHIELD",
-      title: "Senior Scam & Asset Safeguards",
-      ref: "Equifax & Experian FROZEN 🔒",
-      notes: "House Deed Title Lock: Monitored\nVanguard Brokerage Trusted Contact: Son (Active)",
-      verified: true
-    }
-  ],
-  sitter: {
-    kids: "Leo (Age 7) & Maya (Age 4)",
-    allergies: "• Leo (Age 7): Severe Peanut Allergy! EpiPen in kitchen top cabinet right of stove.\n• Maya (Age 4): No allergies.",
-    contacts: "• Parents: (555) 234-8901 / (555) 234-8902\n• Pediatrician: Dr. Sarah Bennett (555-902-1144)",
-    house: "• Front Door Code: #4829\n• Wi-Fi: MillerFamily_5G (Pass: OakTree2024!)\n• Bedtimes: Maya at 7:45 PM; Leo at 8:15 PM."
-  }
-};
-
-// Sound Synthesizer with automatic user-gesture unlock
-class SoundController {
-  constructor() {
-    this.ctx = null;
-  }
-  init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) this.ctx = new AudioCtx();
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
-  }
-  pop(freq = 520) {
-    this.init();
-    if (!this.ctx) return;
-    try {
-      const osc = this.ctx.createOscillator();
-      const g = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      g.gain.setValueAtTime(0.035, this.ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.12);
-      osc.connect(g);
-      g.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.12);
-    } catch (e) {}
-  }
-}
-const sound = new SoundController();
-
-// Unlock audio on first interaction
-window.addEventListener('pointerdown', () => sound.init(), { once: true });
-window.addEventListener('keydown', () => sound.init(), { once: true });
-
-// Toast Notification with robust timeout management
-const toast = document.getElementById('toast');
-const toastMsg = document.getElementById('toastMsg');
-let toastTimeout = null;
-
-function showToast(msg) {
-  sound.pop(640);
-  if (toastTimeout) clearTimeout(toastTimeout);
-  toastMsg.innerText = msg;
-  toast.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
-  toastTimeout = setTimeout(() => {
-    toast.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
-  }, 2200);
-}
-
-// ================= THEME MANAGER =================
-const themeToggleBtn = document.getElementById('themeToggleBtn');
-const themeToggleIcon = document.getElementById('themeToggleIcon');
-
-function updateThemeUI(isDark) {
-  if (isDark) {
-    document.documentElement.classList.add('dark');
-    themeToggleIcon.innerText = '☀️';
-    themeToggleBtn.title = "Switch to Light Mode";
-  } else {
-    document.documentElement.classList.remove('dark');
-    themeToggleIcon.innerText = '🌙';
-    themeToggleBtn.title = "Switch to Dark Mode";
-  }
-}
-
-function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const isDark = saved === 'dark' || (!saved && systemDark);
-  updateThemeUI(isDark);
-}
-
-themeToggleBtn.addEventListener('click', () => {
-  sound.pop(720);
-  const isCurrentlyDark = document.documentElement.classList.contains('dark');
-  const newDark = !isCurrentlyDark;
-  localStorage.setItem(THEME_KEY, newDark ? 'dark' : 'light');
-  updateThemeUI(newDark);
-  showToast(newDark ? "Dark mode activated 🌙" : "Light mode activated ☀️");
-});
-
-// State Manager
-let vaultState = null;
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      vaultState = JSON.parse(raw);
-    } else {
-      vaultState = JSON.parse(JSON.stringify(BLANK_VAULT_DATA));
-      saveState();
-    }
-  } catch (err) {
-    console.error("Failed to parse vault state, resetting to clean blank:", err);
-    vaultState = JSON.parse(JSON.stringify(BLANK_VAULT_DATA));
-  }
-}
-
-function saveState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(vaultState));
-  } catch (e) {
-    console.error("Local storage error:", e);
-  }
-}
-
-// Category Guidance & Empty State Configuration
-const EMPTY_STATE_CONFIG = {
-  urgent: {
-    icon: "🚨",
-    title: "No First 24-Hour Lifelines Added",
-    desc: "Add your primary next-of-kin contact, emergency cash reserve location, or employer HR benefits line.",
-    badge: "CALL FIRST",
-    btnColor: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800"
-  },
-  finance: {
-    icon: "💳",
-    title: "No Financial Lifelines Mapped",
-    desc: "Record your term life insurance policies, mortgage draft dates, or master password vault location.",
-    badge: "LIFE POLICY",
-    btnColor: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800"
-  },
-  home: {
-    icon: "🏡",
-    title: "No Home Utility Specs Recorded",
-    desc: "Document your main water shutoff valve, electrical breaker panel location, or HVAC filter dimensions.",
-    badge: "WATER VALVE",
-    btnColor: "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800"
-  },
-  parents: {
-    icon: "👵",
-    title: "No Aging Parent Records Added",
-    desc: "Track elderly parents' Medicare IDs, cardiologists, active Power of Attorney, or fraud protection locks.",
-    badge: "MEDICARE / DPOA",
-    btnColor: "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800"
-  }
-};
-
-function getBadgeColors(cat) {
-  switch (cat) {
-    case 'urgent': return { bg: 'bg-rose-50 dark:bg-rose-950/50', text: 'text-rose-700 dark:text-rose-300', border: 'border-rose-200 dark:border-rose-900/60' };
-    case 'finance': return { bg: 'bg-blue-50 dark:bg-blue-950/50', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-200 dark:border-blue-900/60' };
-    case 'home': return { bg: 'bg-amber-50 dark:bg-amber-950/50', text: 'text-amber-800 dark:text-amber-300', border: 'border-amber-200 dark:border-amber-900/60' };
-    case 'parents': return { bg: 'bg-purple-50 dark:bg-purple-950/50', text: 'text-purple-700 dark:text-purple-300', border: 'border-purple-200 dark:border-purple-900/60' };
-    default: return { bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-700 dark:text-slate-300', border: 'border-slate-200 dark:border-slate-700' };
-  }
-}
-
-// Create dynamic card element with enhanced typography, non-collapsing lines & overflow protection
-function createCardElement(cat, item, index = 0) {
-  const colors = getBadgeColors(cat);
-  const card = document.createElement('div');
-  card.className = 'card-item bg-white dark:bg-[#101726] rounded-2xl border border-slate-200 dark:border-slate-800/90 p-4 sm:p-5 shadow-sm hover:shadow-md dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-3.5 min-w-0 overflow-hidden break-words';
-  card.style.animationDelay = `${index * 0.05}s`;
-  card.dataset.id = item.id;
-  card.dataset.cat = cat;
-
-  const notesHtml = (item.notes || 'No extra notes recorded.')
-    .split('\n')
-    .map(line => line.trim() ? `<div class="break-words overflow-hidden">${escapeHtml(line)}</div>` : `<div class="h-1.5"></div>`)
-    .join('');
-
-  card.innerHTML = `
-    <div class="min-w-0">
-      <div class="flex items-center justify-between mb-2.5 gap-2 min-w-0">
-        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${colors.bg} ${colors.text} border ${colors.border} font-mono uppercase tracking-wider truncate max-w-[65%] shrink-0">
-          ${escapeHtml(item.badge || 'LIFELINE')}
-        </span>
-        <button type="button" class="toggle-verify-btn text-xs sm:text-sm font-bold ${item.verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} hover:opacity-80 transition-all flex items-center gap-1.5 font-display shrink-0" title="Toggle verification status">
-          ${item.verified ? '✓ VERIFIED' : '⚪ UNVERIFIED'}
-        </button>
-      </div>
-      <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display leading-snug break-words overflow-hidden">${escapeHtml(item.title)}</h3>
-      <p class="text-xs md:text-sm font-mono font-medium text-slate-500 dark:text-slate-400 mt-1 break-all overflow-hidden">${escapeHtml(item.ref || 'No identifier recorded')}</p>
-      <div class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs md:text-sm text-slate-700 dark:text-slate-300 space-y-1 font-sans leading-relaxed break-words overflow-hidden">
-        ${notesHtml}
-      </div>
-    </div>
-    <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between no-print gap-2">
-      <button type="button" class="edit-btn text-xs md:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-display active:scale-95 transition-transform shrink-0">
-        ✏️ Edit
-      </button>
-      <button type="button" class="delete-btn text-xs md:text-sm font-bold text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-display active:scale-95 transition-transform shrink-0">
-        🗑️ Delete
-      </button>
-    </div>
-  `;
-
-  card.querySelector('.edit-btn').addEventListener('click', () => openEditModal(cat, item.id));
-  card.querySelector('.delete-btn').addEventListener('click', () => deleteRecord(cat, item.id));
-  card.querySelector('.toggle-verify-btn').addEventListener('click', () => toggleVerify(cat, item.id));
-
-  return card;
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-}
-
-// Render entire UI
-function renderAll() {
-  const name = vaultState.familyName || "My Family Vault";
-  document.getElementById('familyNameDisplay').innerText = name;
-  document.getElementById('printFamilyTitle').innerText = `${name}`;
-
-  const grids = {
-    urgent: document.getElementById('urgentGrid'),
-    finance: document.getElementById('financeGrid'),
-    home: document.getElementById('homeGrid'),
-    parents: document.getElementById('parentsGrid')
+/* Ark — a local household handover. All assets are bundled. */
+"use strict";
+const A = window.Ark;
+const $ = (id) => document.getElementById(id);
+const esc = (value) =>
+  String(value ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
+const formatDate = (date) =>
+  date
+    ? new Date(date).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "Not yet";
+const clone = (value) => JSON.parse(JSON.stringify(value));
+function icon(name) {
+  const paths = {
+    overview: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
+    people:
+      "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M16 3a4 4 0 0 1 0 8 M22 21v-2a4 4 0 0 0-3-3.87 M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
+    money: "M3 5h17v15H3z M3 5V3h14 M15 11h6v5h-6z",
+    home: "m3 10 9-7 9 7v11H3z M9 21v-8h6v8",
+    care: "M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8",
+    documents: "M14 2H4v20h16V8z M14 2v6h6 M8 12h8 M8 16h8",
+    handover: "M5 19 19 5 M5 5h14v14",
+    digital: "M15 7a5 5 0 1 1-9 3L2 14v4h4v-3h3l3-3 M15 6h.01",
   };
-
-  ['urgent', 'finance', 'home', 'parents'].forEach(cat => {
-    const container = grids[cat];
-    container.innerHTML = '';
-    const items = vaultState[cat] || [];
-    const cfg = EMPTY_STATE_CONFIG[cat];
-
-    if (items.length === 0) {
-      const emptyDiv = document.createElement('div');
-      emptyDiv.className = 'col-span-full p-8 md:p-10 text-center bg-white/80 dark:bg-slate-900/60 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl space-y-3.5 transition-colors';
-      emptyDiv.innerHTML = `
-        <div class="text-4xl transform hover:scale-110 transition-transform duration-200">${cfg.icon}</div>
-        <div>
-          <h4 class="text-base md:text-lg font-black text-slate-800 dark:text-slate-200 font-display">${cfg.title}</h4>
-          <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1.5 leading-relaxed">${cfg.desc}</p>
-        </div>
-        <button type="button" class="add-cat-btn px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${cfg.btnColor} font-display active:scale-95 shadow-sm">
-          ➕ Add First ${cfg.badge}
-        </button>
-      `;
-      emptyDiv.querySelector('.add-cat-btn').addEventListener('click', () => {
-        openAddModal(cat, cfg.badge);
-      });
-      container.appendChild(emptyDiv);
-    } else {
-      items.forEach((item, idx) => {
-        container.appendChild(createCardElement(cat, item, idx));
-      });
-    }
-  });
-
-  // Counters
-  const uCount = (vaultState.urgent || []).length;
-  const fCount = (vaultState.finance || []).length;
-  const hCount = (vaultState.home || []).length;
-  const pCount = (vaultState.parents || []).length;
-
-  document.getElementById('tileUrgentCount').innerText = `${uCount} Actions`;
-  document.getElementById('tileFinanceCount').innerText = `${fCount} Accounts`;
-  document.getElementById('tileHomeCount').innerText = `${hCount} Specs`;
-  document.getElementById('tileParentsCount').innerText = `${pCount} Records`;
-
-  document.getElementById('urgentTabCount').innerText = `${uCount} Actions`;
-  document.getElementById('financeTabCount').innerText = `${fCount} Accounts Mapped`;
-  document.getElementById('homeTabCount').innerText = `${hCount} Specs Saved`;
-
-  // Sitter form values
-  const sitter = vaultState.sitter || {};
-  document.getElementById('sitterKidsInput').value = sitter.kids || '';
-  document.getElementById('sitterAllergiesInput').value = sitter.allergies || '';
-  document.getElementById('sitterContactsInput').value = sitter.contacts || '';
-  document.getElementById('sitterHouseInput').value = sitter.house || '';
-
-  // Calculate score
-  calculateReadinessScore();
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.documents}"/></svg>`;
 }
-
-function calculateReadinessScore() {
-  const allCards = [
-    ...(vaultState.urgent || []),
-    ...(vaultState.finance || []),
-    ...(vaultState.home || []),
-    ...(vaultState.parents || [])
+let state = A.blank(),
+  personalState = null,
+  demoMode = false,
+  lastStored = null,
+  corrupt = false,
+  conflict = false,
+  pendingRestore = null,
+  restoreGeneration = 0,
+  toastTimer;
+const warning = (message) => {
+  $("storageWarning").textContent = message;
+  $("storageWarning").hidden = !message;
+};
+function load() {
+  try {
+    lastStored = localStorage.getItem(A.STORAGE_KEY);
+    if (lastStored !== null) state = A.validate(JSON.parse(lastStored));
+    else {
+      const legacy = localStorage.getItem(A.LEGACY_KEY);
+      if (legacy !== null) {
+        state = A.migrateLegacy(JSON.parse(legacy));
+        A.persist(localStorage, state);
+        lastStored = JSON.stringify(state);
+        warning(
+          "Your older Ark notes were imported without marking them reviewed. The old browser copy is unchanged. Check imported notes, complete the essentials, and download an encrypted backup.",
+        );
+      }
+    }
+  } catch {
+    corrupt = true;
+    warning(
+      "Ark could not read your browser copy. It has not been replaced. Restore a valid backup, or save the unreadable copy before seeking help.",
+    );
+    const recovery = document.createElement("button");
+    recovery.className = "button secondary small";
+    recovery.textContent = "Save unreadable copy";
+    recovery.addEventListener("click", () => {
+      try {
+        download(
+          localStorage.getItem(A.STORAGE_KEY) ??
+            localStorage.getItem(A.LEGACY_KEY) ??
+            "",
+          "ark-unreadable-copy.json",
+        );
+      } catch {
+        toast(
+          "This browser is blocking access to local storage. Try its normal browsing mode.",
+        );
+      }
+    });
+    $("storageWarning").append(document.createElement("br"), recovery);
+  }
+}
+function toast(message) {
+  clearTimeout(toastTimer);
+  $("toast").textContent = message;
+  $("toast").hidden = false;
+  toastTimer = setTimeout(() => ($("toast").hidden = true), 4500);
+}
+function commit(next, errorId, restore = false) {
+  try {
+    next.updatedAt = A.now();
+    const clean = A.validate(next);
+    if (!demoMode) {
+      if (conflict)
+        throw new Error(
+          "Another tab changed this household. Reload Ark before saving. Your current form has not been cleared.",
+        );
+      if (corrupt && !restore)
+        throw new Error(
+          "Your existing browser copy could not be read. Restore a valid backup first; the existing copy is preserved.",
+        );
+      if (localStorage.getItem(A.STORAGE_KEY) !== lastStored) {
+        conflict = true;
+        throw new Error(
+          "Another tab changed this household. Reload Ark before saving.",
+        );
+      }
+      A.persist(localStorage, clean);
+      lastStored = JSON.stringify(clean);
+      corrupt = false;
+      if (restore) warning("");
+    }
+    state = clean;
+    render();
+    return true;
+  } catch (error) {
+    const message =
+      error.name === "QuotaExceededError" || error.name === "SecurityError"
+        ? "This browser could not save your changes. The previous saved copy is unchanged. Keep this form open and check storage permissions or available space."
+        : error.message;
+    if (errorId) $(errorId).textContent = message;
+    warning(message);
+    $("saveStatus").textContent = "Changes not saved";
+    return false;
+  }
+}
+function openDialog(id) {
+  $(id).showModal();
+}
+function closeDialog(dialog) {
+  dialog.close();
+}
+document
+  .querySelectorAll("[data-close]")
+  .forEach((button) =>
+    button.addEventListener("click", () =>
+      closeDialog(button.closest("dialog")),
+    ),
+  );
+document.querySelectorAll("dialog").forEach((dialog) =>
+  dialog.addEventListener("click", (event) => {
+    if (event.target !== dialog) return;
+    const box = dialog.getBoundingClientRect();
+    if (
+      event.clientX < box.left ||
+      event.clientX > box.right ||
+      event.clientY < box.top ||
+      event.clientY > box.bottom
+    )
+      dialog.close();
+  }),
+);
+function confirmAction(heading, message, label, action) {
+  $("confirmHeading").textContent = heading;
+  $("confirmMessage").textContent = message;
+  $("confirmAction").textContent = label;
+  $("confirmAction").onclick = () => {
+    if (action() !== false) $("confirmDialog").close();
+  };
+  openDialog("confirmDialog");
+}
+function sectionName(id) {
+  return A.SECTIONS.find((s) => s.id === id)?.name ?? id;
+}
+function reviewLabel(r) {
+  const status = A.status(r);
+  return status === "reviewed"
+    ? `Reviewed ${formatDate(r.reviewedAt)}`
+    : status === "stale"
+      ? `Review due · ${formatDate(r.reviewedAt)}`
+      : "Draft · not reviewed";
+}
+function currentPage() {
+  const id = location.hash.slice(1);
+  return ["overview", "handover", ...A.SECTIONS.map((s) => s.id)].includes(id)
+    ? id
+    : "overview";
+}
+function renderNavigation(page) {
+  const links = [
+    { id: "overview", name: "Overview", icon: "◫" },
+    ...A.SECTIONS,
+    { id: "handover", name: "Your handover", icon: "↗" },
   ];
-
-  const total = allCards.length;
-  const gaugeBox = document.getElementById('scoreGaugeBox');
-  const readout = document.getElementById('scoreReadout');
-
-  if (total === 0) {
-    updateReadinessUI(0, 0, 0, "⚪ Status: Clean Slate", "0 Lifelines Added — Add your first record to begin");
-    document.getElementById('heroSubtitle').innerText = "Your vault is completely private and saved in your local browser storage. Start by adding your first lifeline.";
-    
-    // Muted styling for 0%
-    gaugeBox.className = "flex items-center gap-4 bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300";
-    readout.className = "text-4xl md:text-5xl font-black font-mono tracking-tight text-slate-400 dark:text-slate-500 transition-colors";
+  $("navigation").innerHTML = links
+    .map(
+      (s) =>
+        `${s.id === "handover" ? '<div class="nav-divider"></div>' : ""}<a class="nav-link ${page === s.id ? "active" : ""}" ${page === s.id ? 'aria-current="page"' : ""} href="#${s.id}"><span class="nav-symbol">${icon(s.id)}</span>${s.name}${A.SECTIONS.some((t) => t.id === s.id) ? `<span class="nav-count">${state.records.filter((r) => r.section === s.id).length}</span>` : ""}</a>`,
+    )
+    .join("");
+}
+const houseArt = `<svg viewBox="0 0 220 230" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="132" cy="120" r="78" fill="#e0e7d9"/><path d="M34 190h169" stroke="#b0bea5"/><path d="m65 114 58-50 59 50v77H65z" fill="#fbfcf5" stroke="#73866c" stroke-width="1.5"/><path d="m52 119 71-61 71 61" stroke="#61785b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M113 146h29v45h-29z" fill="#d9b58d" stroke="#a88761"/><path d="M80 125h23v24H80zm74 0h17v24h-17z" fill="#d5dfce" stroke="#96a68d"/><path d="M91 126v22m-10-10h21" stroke="#a0b093"/><circle cx="135" cy="169" r="2" fill="#a27d56"/><path d="M48 190v-45m0 18c-20-8-23-24-21-31 19 3 25 20 21 31Zm0-10c19-11 20-28 17-34-17 5-22 24-17 34Z" fill="#93a583" stroke="#7d936d"/><path d="M178 190v-28m0 11c14-4 19-15 17-21-14 1-20 13-17 21Z" fill="#93a583" stroke="#7d936d"/><path d="m144 68 10-4v22" stroke="#73866c" stroke-width="6"/><circle cx="180" cy="66" r="10" fill="#d4a675"/><path d="M87 63c5-6 11-6 16 0m-64 38c5-6 11-6 16 0" stroke="#9cae91" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+function planMarkup() {
+  return `<div class="panel plan-panel"><div class="plan-icon" aria-hidden="true">▤</div><h2>A plan worth sharing.</h2><p>Give your trusted person a clear place to start.</p><dl><div><dt>Prepared for</dt><dd>${esc(state.recipient || "Choose your trusted person")}</dd></div><div><dt>Printed packet</dt><dd>${esc(state.packetLocation || "Choose a place they can find")}</dd></div><div><dt>Backup copy</dt><dd>${esc(state.backupLocation || "Keep a separate, tested copy")}</dd></div></dl><button class="button secondary" data-action="profile">${state.recipient ? "Edit handover plan" : "Set up your handover plan"} <span aria-hidden="true">↗</span></button></div>`;
+}
+function essentialsMarkup() {
+  const p = A.progress(state);
+  return `<section class="panel" aria-labelledby="essentialsHeading"><div class="panel-header"><div><h2 id="essentialsHeading">Your household essentials</h2><p>Small steps toward a useful handover.</p></div><span class="pill green">${p.reviewed} of ${p.total} reviewed</span></div><progress class="progress-track" max="${p.total || 1}" value="${p.reviewed}" aria-label="Applicable essentials reviewed"></progress><p class="progress-caption">${p.excluded ? `${p.excluded} marked not applicable. ` : ""}Reviews are due after 90 days. This checklist is not a safety or legal assessment.</p>${A.ESSENTIALS.map(
+    (t) => {
+      const record = state.records.find((r) => r.template === t.id),
+        excluded = state.notApplicable.includes(t.id),
+        status = A.status(record);
+      return `<div class="essential-row"><span class="essential-icon ${status === "reviewed" ? "done" : ""}" aria-hidden="true">${status === "reviewed" ? "✓" : icon(t.id === "digital" ? "digital" : t.section)}</span><div class="essential-body"><h3>${t.title}</h3><p>${excluded ? "Marked not applicable" : record ? esc(reviewLabel(record)) : t.subtitle}</p></div><button class="text-button" data-essential="${t.id}">${excluded ? "Include again" : record ? "Open note" : "Add note"} <span aria-hidden="true">↗</span></button>${!record && !excluded ? `<button class="text-button" data-exclude="${t.id}" aria-label="Mark ${esc(t.title)} not applicable">N/A</button>` : ""}</div>`;
+    },
+  ).join("")}</section>`;
+}
+function renderOverview() {
+  const next = A.ESSENTIALS.find(
+    (t) =>
+      !state.notApplicable.includes(t.id) &&
+      A.status(state.records.find((r) => r.template === t.id)) !== "reviewed",
+  );
+  const stale = state.records.filter((r) => A.status(r) === "stale").length;
+  $("pageContent").innerHTML =
+    `${stale ? `<div class="notice">${stale} ${stale === 1 ? "note is" : "notes are"} due for a review. Check the details with the relevant person or provider.</div>` : ""}<div class="overview-layout"><div class="main-column"><section class="hero"><div class="hero-copy"><p class="eyebrow">START SMALL. MAKE IT USEFUL.</p><h2>${next ? "A little clarity for<br>life’s what-ifs." : "The next step?<br>Try it together."}</h2><p>${next ? "Who to call. Where to look. What to do next. Put the essentials in one thoughtful place." : "Your checklist is a starting point. Now check that someone else can use the handover."}</p><button class="button primary" ${next ? `data-essential="${next.id}"` : 'data-action="drill"'}>${next ? (state.records.length ? "Continue your setup" : "Start with the essentials") : "Practice the handover"} <span aria-hidden="true">→</span></button></div><div class="hero-art">${houseArt}</div></section>${essentialsMarkup()}</div><aside class="side-column" aria-label="Your next steps">${planMarkup()}<section class="note-card"><p class="eyebrow">THE BEST KIND OF BACKUP</p><h3>Someone who knows<br>where to look.</h3><p>Print a copy. Tell your trusted person where it lives. Try finding a few important details together.</p><a href="#handover" class="text-button">Make your handover useful ↗</a></section><p class="bottom-tip"><strong>New here?</strong> Explore a fictional household before you begin.<br><button class="text-button" data-action="demo">${demoMode ? "Return to your household" : "Take a look at an example"} ↗</button><br><button class="text-button" data-action="privacy">Privacy & storage details</button></p></aside></div>`;
+}
+function cardMarkup(r) {
+  return `<article class="panel record-card"><div><span class="pill ${A.status(r) === "reviewed" ? "green" : "orange"}">${esc(reviewLabel(r))}</span></div><h3>${esc(r.title)}</h3><p class="record-ref">${esc(r.ref)}</p><p class="record-notes">${esc(r.notes)}</p><div class="record-actions"><button class="text-button" data-edit="${r.id}">Edit note</button><button class="text-button" data-review="${r.id}">${A.status(r) === "reviewed" ? "Review again" : "Mark reviewed"}</button><button class="text-button danger" data-delete="${r.id}">Delete</button></div></article>`;
+}
+function renderSection(page) {
+  const section = A.SECTIONS.find((s) => s.id === page),
+    records = state.records.filter((r) => r.section === page);
+  const templates = A.ESSENTIALS.filter(
+    (t) =>
+      t.section === page &&
+      !state.records.some((r) => r.template === t.id) &&
+      !state.notApplicable.includes(t.id),
+  );
+  $("pageContent").innerHTML =
+    `<div class="section-toolbar"><h2>${records.length} ${records.length === 1 ? "household note" : "household notes"}</h2><button class="button secondary" data-add="${page}">+ Add a note</button></div>${records.length ? `<div class="record-grid">${records.map(cardMarkup).join("")}</div>` : `<div class="panel empty-section"><span class="plan-icon" aria-hidden="true">${section.icon}</span><h2>Leave a little less to guesswork.</h2><p>${section.description} Start with a guided essential, or add your own note.</p><button class="button primary" ${templates[0] ? `data-essential="${templates[0].id}"` : `data-add="${page}"`}>${templates[0] ? "Start this essential" : "Add your first note"}</button></div>`}${templates.length ? `<div class="panel section-hint"><h3>Suggested essentials</h3>${templates.map((t) => `<p><button class="text-button" data-essential="${t.id}">${t.title} ↗</button></p>`).join("")}</div>` : ""}<p class="section-hint">Notes are drafts until you explicitly review them. Editing a note makes it a draft again.</p>`;
+}
+function renderHandover() {
+  $("pageContent").innerHTML =
+    `<div class="handover-grid">${planMarkup()}<section class="panel practice-card"><p class="eyebrow">PREPARATION IS A SHARED THING</p><h2>Give it a practice run.</h2><p>A filled-in note is a start. A handover works when someone else can find it and understand what to do.</p><div class="checklist-simple"><p>Choose what to include in a family or caregiver packet.</p><p>Print it, or save a PDF somewhere appropriate.</p><p>Ask your trusted person to find the important details.</p><p>Restore your encrypted backup in a different browser.</p></div><p><strong>Last recorded practice:</strong> ${formatDate(state.practicedAt)}</p><button class="button secondary" data-action="drill">Record a practice run ↗</button></section><section class="panel"><h2>Share only what’s needed.</h2><p class="section-hint">A caregiver may need routines and an emergency contact, without your financial or legal notes. Review the selected notes before printing or copying.</p><button class="button primary" data-action="packet">Choose packet contents</button></section><section class="panel"><h2>A map, not a legal document.</h2><p class="section-hint">Your notes help people locate information. They do not give permission to act on an account, appoint a guardian, or replace professional instructions. Keep originals and authorized access arrangements current.</p><button class="text-button" data-action="privacy">Read privacy & product limits ↗</button></section></div>`;
+}
+function render() {
+  const page = currentPage(),
+    section = A.SECTIONS.find((s) => s.id === page);
+  $("householdName").textContent = state.familyName;
+  $("demoBanner").hidden = !demoMode;
+  $("saveStatus").textContent = demoMode
+    ? "Example · changes are temporary"
+    : corrupt || conflict
+      ? "Browser copy needs attention"
+      : lastStored
+        ? "Saved on this browser"
+        : "No notes saved yet";
+  $("breadcrumb").textContent =
+    section?.name || (page === "handover" ? "Your handover" : "Overview");
+  $("pageEyebrow").textContent =
+    page === "overview"
+      ? "A LITTLE PREPARATION. A LOT OF PEACE OF MIND."
+      : page === "handover"
+        ? "FOR THE PEOPLE WHO COUNT ON YOU"
+        : "YOUR HOUSEHOLD, THOUGHTFULLY DOCUMENTED";
+  $("pageTitle").textContent =
+    section?.name ||
+    (page === "handover"
+      ? "Make it easy to pick things up."
+      : "Your family, in good hands.");
+  $("pageDescription").textContent =
+    section?.description ||
+    (page === "handover"
+      ? "Make a copy, choose a person, and try it together."
+      : "Make the important things easy to find, even when you’re not there.");
+  renderNavigation(page);
+  if (page === "overview") renderOverview();
+  else if (page === "handover") renderHandover();
+  else renderSection(page);
+  // An unprepared browser print must not silently disclose every household note.
+  $("printPacket").innerHTML =
+    '<div class="packet-document"><h1>Create a handover first</h1><p>Return to Ark and choose Create handover. Select the notes you intend to print, then use Print / save PDF.</p></div>';
+}
+function openRecord(templateId = null, id = null, section = "people") {
+  const t = A.ESSENTIALS.find((t) => t.id === templateId),
+    existing = id
+      ? state.records.find((r) => r.id === id)
+      : state.records.find((r) => r.template === templateId && templateId);
+  if (t && state.notApplicable.includes(t.id)) {
+    const next = clone(state);
+    next.notApplicable = next.notApplicable.filter((x) => x !== t.id);
+    if (!commit(next)) return;
+  }
+  $("recordForm").reset();
+  $("recordError").textContent = "";
+  $("recordStep").textContent = t
+    ? `ESSENTIAL ${A.ESSENTIALS.indexOf(t) + 1} OF ${A.ESSENTIALS.length}`
+    : "HOUSEHOLD NOTE";
+  $("recordHeading").textContent = existing
+    ? "Edit your note"
+    : t?.title || "Add a household note";
+  $("recordPrompt").textContent =
+    t?.prompt ||
+    "Leave clear, practical instructions for someone you trust. Avoid recording access secrets.";
+  $("recordId").value = existing?.id || "";
+  $("recordTemplate").value = existing?.template || t?.id || "";
+  $("recordSection").innerHTML = A.SECTIONS.map(
+    (s) => `<option value="${s.id}">${s.name}</option>`,
+  ).join("");
+  $("recordSection").value = existing?.section || t?.section || section;
+  $("recordSection").disabled = Boolean(t || existing?.template);
+  $("recordTitle").value = existing?.title || "";
+  $("recordTitle").placeholder = t?.example || "e.g. The person to call";
+  $("recordRef").value = existing?.ref || "";
+  $("recordNotes").value = existing?.notes || "";
+  openDialog("recordDialog");
+}
+$("recordForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  $("recordError").textContent = "";
+  const next = clone(state),
+    time = A.now(),
+    id =
+      $("recordId").value ||
+      `note-${crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}`;
+  const record = {
+    id,
+    template: $("recordTemplate").value || null,
+    section: $("recordSection").value,
+    title: $("recordTitle").value.trim(),
+    ref: $("recordRef").value.trim(),
+    notes: $("recordNotes").value.trim(),
+    updatedAt: time,
+    reviewedAt: null,
+  };
+  const index = next.records.findIndex((r) => r.id === id);
+  if (index < 0) next.records.push(record);
+  else next.records[index] = record;
+  next.notApplicable = next.notApplicable.filter((t) => t !== record.template);
+  if (commit(next, "recordError")) {
+    $("recordDialog").close();
+    toast("Note saved as a draft. Check the details, then mark it reviewed.");
+  }
+});
+function openProfile() {
+  $("profileError").textContent = "";
+  $("profileName").value = state.familyName;
+  $("profileRecipient").value = state.recipient;
+  $("profileLocation").value = state.packetLocation;
+  $("profileBackup").value = state.backupLocation;
+  openDialog("profileDialog");
+}
+$("profileForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const next = clone(state);
+  next.familyName = $("profileName").value.trim();
+  next.recipient = $("profileRecipient").value.trim();
+  next.packetLocation = $("profileLocation").value.trim();
+  next.backupLocation = $("profileBackup").value.trim();
+  if (commit(next, "profileError")) {
+    $("profileDialog").close();
+    toast("Handover plan saved.");
+  }
+});
+$("profileBtn").addEventListener("click", openProfile);
+$("privacyBtn").addEventListener("click", () => openDialog("privacyDialog"));
+function toggleDemo() {
+  if (!demoMode) {
+    personalState = state;
+    state = A.demo();
+    demoMode = true;
+  } else {
+    state = personalState;
+    personalState = null;
+    demoMode = false;
+  }
+  location.hash = "overview";
+  render();
+}
+$("exitDemoBtn").addEventListener("click", toggleDemo);
+$("pageContent").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  if (b.dataset.essential) return openRecord(b.dataset.essential);
+  if (b.dataset.add) return openRecord(null, null, b.dataset.add);
+  if (b.dataset.edit) return openRecord(null, b.dataset.edit);
+  if (b.dataset.exclude)
+    return confirmAction(
+      "Not applicable to your household?",
+      "This essential will be shown as not applicable, separate from reviewed notes. You can include it again at any time.",
+      "Mark not applicable",
+      () => {
+        const next = clone(state);
+        next.notApplicable.push(b.dataset.exclude);
+        return commit(next);
+      },
+    );
+  if (b.dataset.delete)
+    return confirmAction(
+      "Delete this note?",
+      "This removes the note from this browser copy. Previously downloaded backups and printed packets will still contain it.",
+      "Delete note",
+      () => {
+        const next = clone(state);
+        next.records = next.records.filter((r) => r.id !== b.dataset.delete);
+        return commit(next);
+      },
+    );
+  if (b.dataset.review)
+    return confirmAction(
+      "Have you checked these details?",
+      "Confirm the contact, location, and instructions are current. This records your review date; it is not independent verification.",
+      "Mark reviewed today",
+      () => {
+        const next = clone(state);
+        next.records.find((r) => r.id === b.dataset.review).reviewedAt =
+          A.now();
+        return commit(next);
+      },
+    );
+  if (b.dataset.action === "profile") openProfile();
+  if (b.dataset.action === "privacy") openDialog("privacyDialog");
+  if (b.dataset.action === "demo") toggleDemo();
+  if (b.dataset.action === "packet") openPacket();
+  if (b.dataset.action === "drill") {
+    $("drillForm").reset();
+    $("drillError").textContent = "";
+    openDialog("drillDialog");
+  }
+});
+$("drillForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const next = clone(state);
+  next.practicedAt = A.now();
+  if (commit(next, "drillError")) {
+    $("drillDialog").close();
+    toast("Practice recorded. Repeat after important household changes.");
+  }
+});
+function download(content, name) {
+  const blob = new Blob([content], { type: "application/json" }),
+    url = URL.createObjectURL(blob),
+    a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+function clearRestore() {
+  restoreGeneration++;
+  pendingRestore = null;
+  $("restorePreview").hidden = true;
+  $("backupError").textContent = "";
+}
+$("backupBtn").addEventListener("click", () => {
+  if (demoMode)
+    return toast("Return to your household before using backup or restore.");
+  $("exportForm").reset();
+  $("importForm").reset();
+  clearRestore();
+  $("backupSuccess").textContent = "";
+  openDialog("backupDialog");
+});
+$("exportForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("backupError").textContent = "";
+  $("backupSuccess").textContent = "";
+  if ($("exportPassword").value !== $("exportConfirm").value) {
+    $("backupError").textContent = "The passphrases do not match.";
     return;
   }
-
-  const verified = allCards.filter(c => c.verified).length;
-  const percent = Math.round((verified / total) * 100);
-
-  let statusLabel = "🟢 Status: Strong";
-  if (percent < 50) {
-    statusLabel = "🔴 Status: Vulnerable";
-    gaugeBox.className = "flex items-center gap-4 bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300";
-    readout.className = "text-4xl md:text-5xl font-black font-mono tracking-tight text-rose-600 dark:text-rose-400 transition-colors";
-  } else if (percent < 80) {
-    statusLabel = "🟡 Status: In Progress";
-    gaugeBox.className = "flex items-center gap-4 bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300";
-    readout.className = "text-4xl md:text-5xl font-black font-mono tracking-tight text-amber-600 dark:text-amber-400 transition-colors";
-  } else {
-    statusLabel = "🟢 Status: Strong";
-    gaugeBox.className = "flex items-center gap-4 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300";
-    readout.className = "text-4xl md:text-5xl font-black font-mono tracking-tight text-emerald-600 dark:text-emerald-400 transition-colors";
-  }
-
-  document.getElementById('heroSubtitle').innerText = `${verified} of ${total} records currently verified. Export to USB or print your safe binder anytime.`;
-  updateReadinessUI(percent, verified, total, statusLabel, `${verified} of ${total} Lifelines Verified`);
-}
-
-function updateReadinessUI(percent, verified, total, status, details) {
-  document.getElementById('scoreReadout').innerText = `${percent}%`;
-  document.getElementById('scoreHeadlineSpan').innerText = `${percent}%`;
-  document.getElementById('scoreStatusLabel').innerText = status;
-  document.getElementById('scoreDetailsLabel').innerText = details;
-}
-
-// Delete Record
-function deleteRecord(cat, id) {
-  sound.pop(380);
-  if (confirm("Are you sure you want to delete this record from your vault?")) {
-    vaultState[cat] = (vaultState[cat] || []).filter(item => item.id !== id);
-    saveState();
-    renderAll();
-    showToast("Record deleted from vault 🗑️");
-  }
-}
-
-// Toggle Verify
-function toggleVerify(cat, id) {
-  sound.pop(600);
-  const item = (vaultState[cat] || []).find(i => i.id === id);
-  if (item) {
-    item.verified = !item.verified;
-    saveState();
-    renderAll();
-    showToast(item.verified ? "Marked as Verified ✓" : "Marked as Unverified ⚪");
-  }
-}
-
-// Modal Controllers
-const recordModal = document.getElementById('recordModal');
-const modalHeading = document.getElementById('modalHeading');
-const editRecordId = document.getElementById('editRecordId');
-const cardCat = document.getElementById('cardCat');
-const cardBadge = document.getElementById('cardBadge');
-const cardTitle = document.getElementById('cardTitle');
-const cardRef = document.getElementById('cardRef');
-const cardNotes = document.getElementById('cardNotes');
-const deleteRecordModalBtn = document.getElementById('deleteRecordModalBtn');
-
-function openAddModal(preselectedCat = null, defaultBadge = null) {
-  sound.pop(560);
-  modalHeading.innerText = "Add New Household Lifeline";
-  editRecordId.value = "";
-  cardCat.disabled = false;
-  if (preselectedCat) cardCat.value = preselectedCat;
-  cardBadge.value = defaultBadge || (EMPTY_STATE_CONFIG[cardCat.value] ? EMPTY_STATE_CONFIG[cardCat.value].badge : "");
-  cardTitle.value = "";
-  cardRef.value = "";
-  cardNotes.value = "";
-  deleteRecordModalBtn.classList.add('hidden');
-  recordModal.classList.remove('hidden');
-
-  setTimeout(() => cardTitle.focus(), 60);
-}
-
-// When changing category in Add modal, auto-suggest badge if empty
-cardCat.addEventListener('change', () => {
-  if (!editRecordId.value) {
-    const cfg = EMPTY_STATE_CONFIG[cardCat.value];
-    if (cfg) cardBadge.value = cfg.badge;
-  }
-});
-
-function openEditModal(cat, id) {
-  sound.pop(560);
-  const item = (vaultState[cat] || []).find(i => i.id === id);
-  if (!item) return;
-
-  modalHeading.innerText = "Edit Household Record";
-  editRecordId.value = id;
-  cardCat.value = cat;
-  cardCat.disabled = true;
-  cardBadge.value = item.badge || "";
-  cardTitle.value = item.title || "";
-  cardRef.value = item.ref || "";
-  cardNotes.value = item.notes || "";
-  deleteRecordModalBtn.classList.remove('hidden');
-  recordModal.classList.remove('hidden');
-
-  setTimeout(() => cardTitle.focus(), 60);
-}
-
-function closeRecordModal() {
-  recordModal.classList.add('hidden');
-}
-
-document.getElementById('addCardBtn').addEventListener('click', () => openAddModal());
-document.getElementById('closeModal').addEventListener('click', closeRecordModal);
-document.getElementById('cancelModal').addEventListener('click', closeRecordModal);
-
-// Close modal on backdrop click
-recordModal.addEventListener('click', (e) => {
-  if (e.target === recordModal) closeRecordModal();
-});
-
-deleteRecordModalBtn.addEventListener('click', () => {
-  const cat = cardCat.value;
-  const id = editRecordId.value;
-  if (id) {
-    closeRecordModal();
-    deleteRecord(cat, id);
-  }
-});
-
-function submitRecordForm() {
-  const cat = cardCat.value;
-  const id = editRecordId.value;
-  const title = cardTitle.value.trim();
-  const badge = cardBadge.value.trim().toUpperCase() || 'LIFELINE';
-  const ref = cardRef.value.trim();
-  const notes = cardNotes.value.trim();
-
-  if (!title) {
-    showToast('Please enter a title for this record');
-    cardTitle.focus();
+  if (corrupt) {
+    $("backupError").textContent =
+      "Your browser copy could not be read. Save the unreadable copy using the warning above, or restore a valid backup.";
     return;
   }
-
-  if (id) {
-    const item = (vaultState[cat] || []).find(i => i.id === id);
-    if (item) {
-      item.badge = badge;
-      item.title = title;
-      item.ref = ref;
-      item.notes = notes;
-    }
-    showToast(`Updated: ${title} ✨`);
-  } else {
-    const newId = `${cat}-${Date.now()}`;
-    const newRecord = {
-      id: newId,
-      badge: badge,
-      title: title,
-      ref: ref,
-      notes: notes,
-      verified: true
-    };
-    if (!vaultState[cat]) vaultState[cat] = [];
-    vaultState[cat].unshift(newRecord);
-    showToast(`Saved to Vault: ${title} ✨`);
+  $("exportSubmit").disabled = true;
+  try {
+    const encrypted = await A.encrypt(clone(state), $("exportPassword").value);
+    download(
+      JSON.stringify(encrypted, null, 2),
+      `ark-backup-${new Date().toISOString().slice(0, 10)}.json`,
+    );
+    $("exportForm").reset();
+    $("backupSuccess").textContent =
+      "Encrypted file prepared for download. Confirm it is saved, store it separately, and test restoring it. The passphrase is not saved by Ark.";
+  } catch (error) {
+    $("backupError").textContent = error.message;
+  } finally {
+    $("exportSubmit").disabled = false;
   }
-
-  saveState();
-  renderAll();
-  closeRecordModal();
-
-  document.querySelector(`[data-tab="${cat}"]`)?.click();
+});
+$("importFile").addEventListener("change", clearRestore);
+$("importPassword").addEventListener("input", clearRestore);
+$("importForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  clearRestore();
+  $("backupSuccess").textContent = "";
+  const generation = restoreGeneration;
+  $("importSubmit").disabled = true;
+  try {
+    const file = $("importFile").files[0];
+    if (!file || file.size > A.MAX_BYTES)
+      throw new Error("Choose an Ark backup smaller than 5 MB.");
+    const restored = await A.decode(
+      await file.text(),
+      $("importPassword").value,
+    );
+    if (generation !== restoreGeneration || !$("backupDialog").open) return;
+    pendingRestore = restored;
+    $("restoreSummary").textContent =
+      `${restored.familyName} · ${restored.records.length} notes · last changed ${formatDate(restored.updatedAt)}. Review the source of this file before continuing.`;
+    $("restorePreview").hidden = false;
+    $("confirmRestoreBtn").focus();
+  } catch (error) {
+    if (generation === restoreGeneration)
+      $("backupError").textContent = error.message;
+  } finally {
+    $("importSubmit").disabled = false;
+  }
+});
+$("cancelRestoreBtn").addEventListener("click", clearRestore);
+$("confirmRestoreBtn").addEventListener("click", () => {
+  if (!pendingRestore) return;
+  if (commit(clone(pendingRestore), "backupError", true)) {
+    clearRestore();
+    $("importForm").reset();
+    $("backupSuccess").textContent =
+      "Backup restored. Check your notes and make sure your trusted person can find the current packet.";
+  }
+});
+$("backupDialog").addEventListener("close", () => {
+  clearRestore();
+  $("exportForm").reset();
+  $("importForm").reset();
+});
+let packetPreset = "family";
+function selectedIds() {
+  return [...$("packetSelection").querySelectorAll("input:checked")].map(
+    (input) => input.value,
+  );
 }
-
-document.getElementById('saveCardBtn').addEventListener('click', submitRecordForm);
-
-// Enter key submit in modal inputs
-[cardTitle, cardRef, cardBadge].forEach(input => {
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      submitRecordForm();
-    }
-  });
-});
-
-// Tab Switching & Clickable Hero Tiles
-const tabChips = document.querySelectorAll('.tab-chip');
-const tabPanels = {
-  urgent: document.getElementById('tab-urgent'),
-  finance: document.getElementById('tab-finance'),
-  home: document.getElementById('tab-home'),
-  parents: document.getElementById('tab-parents'),
-  sitter: document.getElementById('tab-sitter')
-};
-
-const chipColorMap = {
-  urgent: { bg: 'bg-rose-600', text: 'text-white', shadow: 'shadow-rose-600/20' },
-  finance: { bg: 'bg-blue-600', text: 'text-white', shadow: 'shadow-blue-600/20' },
-  home: { bg: 'bg-amber-600', text: 'text-white', shadow: 'shadow-amber-600/20' },
-  parents: { bg: 'bg-purple-600', text: 'text-white', shadow: 'shadow-purple-600/20' },
-  sitter: { bg: 'bg-emerald-600', text: 'text-white', shadow: 'shadow-emerald-600/20' }
-};
-
-function switchTab(target) {
-  if (!target || !tabPanels[target]) return;
-
-  sound.pop(480);
-
-  tabChips.forEach(c => {
-    c.className = 'tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display';
-  });
-
-  const activeBtn = document.querySelector(`.tab-chip[data-tab="${target}"]`);
-  if (activeBtn) {
-    const color = chipColorMap[target] || chipColorMap.urgent;
-    activeBtn.className = `tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 ${color.bg} ${color.text} shadow-md ${color.shadow} whitespace-nowrap transition-all font-display`;
-  }
-
-  Object.keys(tabPanels).forEach(k => {
-    if (k === target) {
-      tabPanels[k].classList.remove('hidden');
-    } else {
-      tabPanels[k].classList.add('hidden');
-    }
-  });
+function buildPacket(ids, includePlan, title) {
+  const selected = state.records.filter((r) => ids.includes(r.id)),
+    wrapper = document.createElement("div");
+  wrapper.className = "packet-document";
+  const missing = A.ESSENTIALS.filter(
+    (t) =>
+      !state.notApplicable.includes(t.id) &&
+      !state.records.some((r) => r.template === t.id),
+  );
+  wrapper.innerHTML = `<header class="packet-cover"><p class="packet-kicker">ARK / ${demoMode ? "FICTIONAL EXAMPLE / " : ""}CONFIDENTIAL HOUSEHOLD INFORMATION</p><h1>${esc(state.familyName)}</h1><h2>${esc(title)}</h2><p class="packet-meta">Prepared ${formatDate(A.now())} · ${selected.length} selected notes</p><p class="packet-meta">Use only with appropriate permission. This packet does not grant legal or account access.</p></header>${includePlan ? `<section><h2>Start here</h2><p><strong>Prepared for:</strong> ${esc(state.recipient || "Not recorded")}</p><p><strong>Printed packet location:</strong> ${esc(state.packetLocation || "Not recorded")}</p><p><strong>Backup location:</strong> ${esc(state.backupLocation || "Not recorded")}</p><p><strong>Last handover practice:</strong> ${formatDate(state.practicedAt)}</p></section>` : ""}<p class="packet-note">${selected.filter((r) => A.status(r) !== "reviewed").length} selected notes are drafts or due for review. Dates reflect household self-review, not independent verification.${includePlan ? ` ${missing.length} essentials have no note. ${state.notApplicable.length} marked not applicable.` : ""} For immediate danger, contact local emergency services.</p>${selected.length ? "" : "<p>No notes selected. Add a note or choose notes above.</p>"}${A.SECTIONS.map(
+    (s) => {
+      const records = selected.filter((r) => r.section === s.id);
+      return records.length
+        ? `<section><h2>${s.name}</h2>${records.map((r) => `<article><h3>${esc(r.title)}</h3><p class="packet-meta">${esc(reviewLabel(r))}</p>${r.ref ? `<p><strong>Contact / location:</strong> ${esc(r.ref)}</p>` : ""}<p>${esc(r.notes)}</p></article>`).join("")}</section>`
+        : "";
+    },
+  ).join(
+    "",
+  )}<footer class="packet-footer">Printed and copied information is unencrypted and cannot be revoked. Keep it in an appropriate place and replace older copies after changes. This organizer is not legal, medical, or financial advice.</footer>`;
+  return wrapper;
 }
-
-tabChips.forEach(chip => {
-  chip.addEventListener('click', () => switchTab(chip.dataset.tab));
-});
-
-// Clickable Hero Tiles navigate directly to tabs
-document.querySelectorAll('[data-nav-tab]').forEach(tile => {
-  tile.addEventListener('click', () => {
-    const target = tile.dataset.navTab;
-    if (target) {
-      switchTab(target);
-      const targetElem = document.querySelector(`[data-tab="${target}"]`);
-      if (targetElem) {
-        targetElem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-    }
-  });
-});
-
-// Sitter Briefing
-const saveSitterBtn = document.getElementById('saveSitterBtn');
-const copySitterAction = document.getElementById('copySitterAction');
-
-function syncSitterFromInputs() {
-  vaultState.sitter = {
-    kids: document.getElementById('sitterKidsInput').value.trim(),
-    allergies: document.getElementById('sitterAllergiesInput').value.trim(),
-    contacts: document.getElementById('sitterContactsInput').value.trim(),
-    house: document.getElementById('sitterHouseInput').value.trim()
-  };
-  saveState();
+function renderPrintPacket(ids, includePlan, title) {
+  $("printPacket").replaceChildren(buildPacket(ids, includePlan, title));
 }
-
-saveSitterBtn.addEventListener('click', () => {
-  syncSitterFromInputs();
-  showToast("Babysitter briefing saved! 👶");
-});
-
-copySitterAction.addEventListener('click', () => {
-  syncSitterFromInputs();
-  const s = vaultState.sitter || {};
-  const kids = s.kids || "Children";
-  const allergies = s.allergies || "None recorded.";
-  const contacts = s.contacts || "See emergency contacts.";
-  const house = s.house || "Standard routine.";
-
-  const text = `👶 ${kids.toUpperCase()} — BABYSITTER BRIEFING
-
-⚠️ ALLERGIES & MEDS:
-${allergies}
-
-📞 CONTACTS:
-${contacts}
-
-🏡 HOUSE & BEDTIME:
-${house}
-
-— Private Briefing via Ark Vault (Offline Household OS)`;
-
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('Sitter SMS copied! Ready to text to babysitter 📱');
-  }).catch(() => {
-    showToast('Failed to copy to clipboard automatically');
-  });
-});
-
-// Family Name Modal
-const familyNameModal = document.getElementById('familyNameModal');
-const familyNameInput = document.getElementById('familyNameInput');
-const editFamilyBtn = document.getElementById('editFamilyBtn');
-const cancelFamilyBtn = document.getElementById('cancelFamilyBtn');
-const saveFamilyBtn = document.getElementById('saveFamilyBtn');
-
-editFamilyBtn.addEventListener('click', () => {
-  sound.pop(520);
-  familyNameInput.value = vaultState.familyName || "My Family Vault";
-  familyNameModal.classList.remove('hidden');
-  setTimeout(() => familyNameInput.focus(), 60);
-});
-
-cancelFamilyBtn.addEventListener('click', () => familyNameModal.classList.add('hidden'));
-familyNameModal.addEventListener('click', (e) => {
-  if (e.target === familyNameModal) familyNameModal.classList.add('hidden');
-});
-
-function submitFamilyName() {
-  const val = familyNameInput.value.trim();
-  if (val) {
-    vaultState.familyName = val;
-    saveState();
-    renderAll();
-    familyNameModal.classList.add('hidden');
-    showToast(`Household name set to: ${val}`);
-  }
+function updatePacketPreview() {
+  const ids = selectedIds(),
+    plan = $("includePlan").checked,
+    title = packetPreset === "care" ? "Caregiver briefing" : "Family handover";
+  $("packetPreview").replaceChildren(buildPacket(ids, plan, title));
+  renderPrintPacket(ids, plan, title);
 }
-
-saveFamilyBtn.addEventListener('click', submitFamilyName);
-familyNameInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    submitFamilyName();
-  }
-});
-
-// Backup & Restore Modal
-const backupModal = document.getElementById('backupModal');
-const backupBtn = document.getElementById('backupBtn');
-const closeBackupModal = document.getElementById('closeBackupModal');
-const doneBackupBtn = document.getElementById('doneBackupBtn');
-const downloadBackupBtn = document.getElementById('downloadBackupBtn');
-const triggerImportBtn = document.getElementById('triggerImportBtn');
-const importFileInput = document.getElementById('importFileInput');
-
-backupBtn.addEventListener('click', () => {
-  sound.pop(520);
-  backupModal.classList.remove('hidden');
-});
-closeBackupModal.addEventListener('click', () => backupModal.classList.add('hidden'));
-doneBackupBtn.addEventListener('click', () => backupModal.classList.add('hidden'));
-backupModal.addEventListener('click', (e) => {
-  if (e.target === backupModal) backupModal.classList.add('hidden');
-});
-
-// Export JSON with local date stamp
-downloadBackupBtn.addEventListener('click', () => {
-  sound.pop(640);
-  const now = new Date();
-  const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(vaultState, null, 2));
-  const downloadAnchor = document.createElement('a');
-  downloadAnchor.setAttribute("href", dataStr);
-  downloadAnchor.setAttribute("download", `ark-family-vault-backup-${dateStr}.json`);
-  document.body.appendChild(downloadAnchor);
-  downloadAnchor.click();
-  downloadAnchor.remove();
-  showToast("Backup exported successfully! 💾");
-});
-
-// Import JSON
-triggerImportBtn.addEventListener('click', () => importFileInput.click());
-
-importFileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    try {
-      const imported = JSON.parse(event.target.result);
-      if (imported && (imported.urgent || imported.finance || imported.familyName)) {
-        vaultState = imported;
-        saveState();
-        renderAll();
-        backupModal.classList.add('hidden');
-        showToast("Vault successfully restored from backup! ✨");
-      } else {
-        alert("The selected file does not appear to be a valid Ark Vault backup.");
-      }
-    } catch (err) {
-      alert("Error reading backup file: Invalid JSON format.");
-    } finally {
-      importFileInput.value = '';
-    }
-  };
-  reader.readAsText(file);
-});
-
-// Template Reset Modal
-const templateModal = document.getElementById('templateModal');
-const templateMenuBtn = document.getElementById('templateMenuBtn');
-const closeTemplateModal = document.getElementById('closeTemplateModal');
-const cancelTemplateBtn = document.getElementById('cancelTemplateBtn');
-const clearToBlankBtn = document.getElementById('clearToBlankBtn');
-const loadSampleDataBtn = document.getElementById('loadSampleDataBtn');
-
-templateMenuBtn.addEventListener('click', () => {
-  sound.pop(520);
-  templateModal.classList.remove('hidden');
-});
-closeTemplateModal.addEventListener('click', () => templateModal.classList.add('hidden'));
-cancelTemplateBtn.addEventListener('click', () => templateModal.classList.add('hidden'));
-templateModal.addEventListener('click', (e) => {
-  if (e.target === templateModal) templateModal.classList.add('hidden');
-});
-
-clearToBlankBtn.addEventListener('click', () => {
-  if (confirm("Clear all cards and reset to clean blank state?")) {
-    vaultState = JSON.parse(JSON.stringify(BLANK_VAULT_DATA));
-    saveState();
-    renderAll();
-    templateModal.classList.add('hidden');
-    switchTab('urgent');
-    showToast("Vault reset to clean blank state 🧹");
-  }
-});
-
-loadSampleDataBtn.addEventListener('click', () => {
-  if (confirm("Load demo example records (The Miller Family)?")) {
-    vaultState = JSON.parse(JSON.stringify(SAMPLE_VAULT_DATA));
-    saveState();
-    renderAll();
-    templateModal.classList.add('hidden');
-    switchTab('urgent');
-    showToast("Demo example records loaded! ✨");
-  }
-});
-
-// Universal Keyboard listener (Escape closes modals)
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    recordModal.classList.add('hidden');
-    familyNameModal.classList.add('hidden');
-    backupModal.classList.add('hidden');
-    templateModal.classList.add('hidden');
-  }
-});
-
-// Print Binder Handling
-function preparePrint() {
-  document.getElementById('printDateSpan').innerText = new Date().toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+function setPreset(preset) {
+  packetPreset = preset;
+  $("includePlan").checked = preset === "family";
+  $("packetSelection").innerHTML =
+    state.records
+      .map(
+        (r) =>
+          `<label class="check-label"><input type="checkbox" value="${r.id}" ${preset === "family" || r.section === "care" || r.template === "first-call" ? "checked" : ""}><span>${esc(r.title)}<small>${sectionName(r.section)} · ${esc(reviewLabel(r))}</small></span></label>`,
+      )
+      .join("") ||
+    '<p class="section-hint">There are no notes yet. Add your first essential before creating a packet.</p>';
+  document.querySelectorAll("[data-preset]").forEach((b) => {
+    b.classList.toggle("selected", b.dataset.preset === preset);
+    b.setAttribute("aria-pressed", String(b.dataset.preset === preset));
   });
+  updatePacketPreview();
 }
-
-document.getElementById('printBtn').addEventListener('click', () => {
-  showToast('Preparing physical safe binder...');
-  preparePrint();
-  setTimeout(() => {
-    window.print();
-  }, 250);
-});
-
-// Hardened Print Hooks to prevent dark ink waste
-window.addEventListener('beforeprint', () => {
-  preparePrint();
-  document.documentElement.classList.remove('dark');
-});
-
-window.addEventListener('afterprint', () => {
-  const saved = localStorage.getItem(THEME_KEY);
-  const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  if (saved === 'dark' || (!saved && systemDark)) {
-    document.documentElement.classList.add('dark');
+function openPacket() {
+  $("packetError").textContent = "";
+  setPreset("family");
+  openDialog("packetDialog");
+}
+$("printBtn").addEventListener("click", openPacket);
+document
+  .querySelectorAll("[data-preset]")
+  .forEach((b) =>
+    b.addEventListener("click", () => setPreset(b.dataset.preset)),
+  );
+$("packetSelection").addEventListener("change", updatePacketPreview);
+$("includePlan").addEventListener("change", updatePacketPreview);
+$("copyPacketBtn").addEventListener("click", async () => {
+  try {
+    if (!navigator.clipboard?.writeText)
+      throw new Error(
+        "Clipboard access is unavailable. Select and copy the preview text manually, or print a packet.",
+      );
+    await navigator.clipboard.writeText($("packetPreview").innerText);
+    $("packetError").textContent = "";
+    toast("Briefing copied. Share only with the intended person.");
+  } catch (error) {
+    $("packetError").textContent = error.message;
   }
 });
-
-// Initial boot
-initTheme();
-loadState();
-renderAll();
+$("printPacketBtn").addEventListener("click", () => {
+  updatePacketPreview();
+  $("packetDialog").close();
+  window.print();
+});
+window.addEventListener("hashchange", () => {
+  render();
+  $("main").focus({ preventScroll: true });
+});
+window.addEventListener("storage", (e) => {
+  if (e.key === A.STORAGE_KEY || e.key === null) {
+    conflict = true;
+    warning(
+      "Another tab changed or cleared this household. Reload Ark before saving to avoid overwriting that copy.",
+    );
+    $("saveStatus").textContent = "Another tab changed this copy";
+  }
+});
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) render();
+});
+load();
+render();

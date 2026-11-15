@@ -1,23 +1,20 @@
 @echo off
-TITLE Ark Vault - Family Operating System
-echo ========================================================
-echo   🛡️  Ark Vault - Family Emergency & Continuity OS
-echo   100%% Private Offline Vault - Zero Cloud Dependency
-echo ========================================================
-echo.
-echo Launching Ark Vault in your default web browser...
-echo.
-
-:: Try opening index.html directly with default browser
-if exist "public\index.html" (
-    start "" "public\index.html"
-) else if exist "index.html" (
-    start "" "index.html"
-) else (
-    echo [!] Could not locate index.html. Starting server fallback...
-    python server.py
+setlocal
+cd /d "%~dp0"
+title Ark - Local household handover
+where py >nul 2>nul
+if %errorlevel% equ 0 (
+    py -3 server.py --open
+    if errorlevel 1 pause
+    exit /b
 )
-
-echo Ark Vault opened!
-timeout /t 3 >nul
-exit
+where python >nul 2>nul
+if %errorlevel% equ 0 (
+    python server.py --open
+    if errorlevel 1 pause
+    exit /b
+)
+echo Python was not found. Opening the standalone file instead.
+echo File-based browser storage varies. Keep backups and use the same browser and location.
+start "" "%~dp0public\index.html"
+pause

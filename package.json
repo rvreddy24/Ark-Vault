@@ -1,0 +1,18 @@
+{
+  "name": "ark-handover",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Offline household handover with encrypted portable backups",
+  "scripts": {
+    "test": "node --test tests/core.test.cjs",
+    "test:browser": "playwright test",
+    "check": "node --check public/core.js && node --check public/app.js",
+    "format": "prettier --write public/*.js public/*.css public/*.html tests/**/*.cjs tests/*.cjs playwright.config.cjs package.json",
+    "format:check": "prettier --check public/*.js public/*.css public/*.html tests/**/*.cjs tests/*.cjs playwright.config.cjs package.json"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
+    "prettier": "^3.10.1"
+  }
+}

@@ -1,78 +1,60 @@
-================================================================================
-🛡️ ARK VAULT — DIGITAL FAMILY CONTINUITY OPERATING SYSTEM
-100% Private, Zero-Cloud Household Runbook & Emergency Black Box
-================================================================================
+ARK — START HERE
+A household handover your family can use
 
-Congratulations on taking this vital step to protect your family!
-If something unexpected happens tomorrow, your spouse, partner, or next-of-kin 
-will have instant clarity on where money, policies, home valves, and emergency 
-instructions are located—without panic or guesswork.
+1. OPEN ARK
+Recommended: install Python 3, then double-click Start-Ark.bat on Windows.
+On macOS, open Terminal in this folder and run: bash Start-Ark.command
+Or run: python server.py --open
+Keep the terminal open. Use http://localhost:5000/ consistently.
 
---------------------------------------------------------------------------------
-1. HOW TO LAUNCH ARK VAULT (Takes 5 Seconds)
---------------------------------------------------------------------------------
-You can open Ark Vault in whichever way is easiest for you:
+Alternative: double-click public/index.html in a current browser. File-based
+storage varies: keep this folder in one location and use the same browser and
+profile. Do not use private browsing. File mode and server mode use separate
+copies. Transfer notes through backup/restore when changing launch methods.
 
-▶ WINDOWS USERS:
-  Double-click "Start-Ark.bat" in this folder. It opens immediately in your 
-  default web browser (Chrome, Edge, Brave, Firefox).
+2. START WITH ONE USEFUL NOTE
+Use Overview > Start with the essentials. Add a contact or location and clear
+instructions. Saved notes begin as drafts. Check the details, then use Mark
+reviewed. Editing makes the note a draft again. Reviews are due after 90 days.
+The checklist measures reviewed essentials, not safety or legal readiness.
+Not-applicable items remain visible. You can include them again later.
 
-▶ MAC / APPLE USERS:
-  Double-click "Start-Ark.command" OR simply double-click "public/index.html".
+3. MAKE A HANDOVER PLAN
+Click your household name. Name the intended person and where the printed
+packet and backup will be kept. Tell them how to find these independently.
 
-▶ ANY BROWSER (NO INSTALL REQUIRED):
-  Simply open the "public" folder and double-click "index.html". 
-  No installation, no internet account, no login required.
+4. KEEP A BACKUP
+Choose Backup & restore. Use a strong passphrase of at least 12 characters,
+repeat it, and download the encrypted file. Confirm the file was saved.
+Keep it separately from the computer. Keep the passphrase somewhere your
+trusted person can find independently. Forgotten passphrases are not recoverable.
 
---------------------------------------------------------------------------------
-2. HOW PRIVACY & SAVING WORKS
---------------------------------------------------------------------------------
-🔒 ZERO CLOUD STORAGE:
-   Ark Vault runs 100% locally on your computer. Your bank accounts, policy 
-   numbers, safe combinations, and passwords NEVER touch any remote server, 
-   AI company, or cloud database.
+5. CREATE A PACKET
+Choose Create handover. Select Family handover or Caregiver briefing, then
+check every included note. Caregiver mode excludes the household location plan
+by default. Print/save a PDF, or copy the text. These copies are NOT encrypted
+and cannot be revoked. Store and share them with appropriate care.
 
-💾 AUTOMATIC LOCAL SAVING:
-   Every time you add, edit, or check off a record, it saves automatically into 
-   your browser's private local storage on your computer.
+6. TRY IT TOGETHER
+Ask the intended person to locate useful details without your help. Restore
+a backup in another browser: check the file, review the preview, and confirm
+replacement. Back up that browser's existing notes first if needed. Record a
+practice only after trying it together.
 
-📁 BACKUP TO USB / DISK (HIGHLY RECOMMENDED):
-   Click "Backup / Restore" in the top bar and select "Download ark-backup.json".
-   Copy this single file onto a secure thumb drive, store it in your safe, or 
-   keep it alongside your estate documents.
+IMPORTANT
+The working browser copy is NOT encrypted. Protect your device and profile.
+Clearing browser data, changing profiles/ports, or moving the app can make a
+copy unavailable. Never use browser storage as your only copy.
+Ark makes no external network requests. That does not protect a compromised
+device, browser extension, or unlocked computer.
 
---------------------------------------------------------------------------------
-3. RECOMMENDED 20-MINUTE SETUP SPRINT
---------------------------------------------------------------------------------
-1. Change Family Name:
-   Click the family name pill in the top header and enter your household name.
+Store locations and access instructions, not passwords, PINs, safe combinations,
+or full identity numbers. Ark does not create legal authority, provide legal or
+medical advice, notify institutions, or grant account access. For urgent danger
+contact local emergency services. Use qualified professional advice.
 
-2. Explore or Start Blank:
-   - Ark starts with pre-filled sample records ("The Miller Family") so you 
-     can see how an airtight household runbook looks.
-   - When you are ready, click "Template Options" in the tabs bar and select 
-     "Clear All & Start Blank", OR simply edit the existing sample cards.
+Older Ark JSON backups can be imported. Review all imported information and
+remove sensitive secrets; old verification flags are not carried forward.
+The example household never replaces your personal browser copy.
 
-3. Complete the 5 Core Sections:
-   - 🚨 First 24 Hours: Primary emergency contact, immediate cash reserve, 
-     employer HR benefits phone/group policy.
-   - 💳 Money & Insurance: Term life policies, mortgage draft dates, master 
-     password vault instructions.
-   - 🏡 Home & Shutoffs: Main water valve, electrical breaker box, HVAC filter.
-   - 👵 Aging Parents: Medicare IDs, cardiologists, active DPOA.
-   - 👶 Sitter Pass: Fill out bedtime routines and allergy alerts. Tap 
-     "Copy SMS" on date night to text your babysitter in 1 second.
-
-4. Print Your Physical Safe Binder:
-   - Click "Print Safe Binder" in the top right.
-   - Print a copy to put inside your home fireproof safe or freezer bag.
-
---------------------------------------------------------------------------------
-4. NEED ASSISTANCE?
---------------------------------------------------------------------------------
-Thank you for supporting an independent software creator. If you have any 
-questions, feedback, or suggestions, please contact our support email provided 
-on your purchase receipt.
-
-Stay safe and prepared.
-— The Ark Team
+See PRIVACY_AND_SECURITY.md for the backup format and detailed limitations.

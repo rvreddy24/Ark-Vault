@@ -13,3 +13,11 @@ venv/
 .DS_Store
 Thumbs.db
 *.tmp
+
+# Development and local test artifacts
+node_modules/
+test-results/
+playwright-report/
+artifacts/
+ark-backup-*.json
+ark-unreadable-copy.json
