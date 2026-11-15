@@ -55,51 +55,51 @@
     .print-only { display: none; }
   </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900 dark:bg-[#090d16] dark:text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white antialiased transition-colors duration-200 text-sm md:text-[15px]">
+<body class="bg-[#f8fafc] text-slate-900 dark:bg-[#090d16] dark:text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white antialiased transition-colors duration-200 text-sm md:text-[15px] overflow-x-hidden">
 
   <!-- ================= TOP NAVIGATION ================= -->
   <header class="w-full bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-sm transition-colors duration-200 no-print">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 min-w-0">
       
       <!-- Brand & Editable Family Name -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 min-w-0">
         <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-indigo-600/20 shrink-0 transform hover:scale-105 transition-transform duration-200">
           🛡️
         </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-base sm:text-lg md:text-xl font-black tracking-tight text-slate-900 dark:text-white font-display">Ark Vault</span>
-            <button id="editFamilyBtn" type="button" title="Click to edit Family Name" class="group flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-all hover:scale-[1.02] active:scale-95">
-              <span id="familyNameDisplay" class="truncate max-w-[130px] sm:max-w-none">My Family Vault</span>
-              <span class="text-xs opacity-60 group-hover:opacity-100">✏️</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-base sm:text-lg md:text-xl font-black tracking-tight text-slate-900 dark:text-white font-display shrink-0">Ark Vault</span>
+            <button id="editFamilyBtn" type="button" title="Click to edit Family Name" class="group flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-all hover:scale-[1.02] active:scale-95 min-w-0 max-w-[140px] sm:max-w-xs">
+              <span id="familyNameDisplay" class="truncate block">My Family Vault</span>
+              <span class="text-xs opacity-60 group-hover:opacity-100 shrink-0">✏️</span>
             </button>
           </div>
-          <div class="flex items-center gap-2 text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-            <span class="hidden sm:inline">Offline Client Vault</span>
-            <span class="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
-            <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon inline-block"></span>
+          <div class="flex items-center gap-2 text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 truncate">
+            <span class="hidden sm:inline shrink-0">Offline Client Vault</span>
+            <span class="hidden sm:inline text-slate-300 dark:text-slate-600 shrink-0">•</span>
+            <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5 shrink-0">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon inline-block shrink-0"></span>
               100% Private (No Cloud)
             </span>
           </div>
         </div>
       </div>
 
-      <!-- Action Buttons (Responsive Sizing) -->
-      <div class="flex items-center gap-1.5 sm:gap-2.5">
+      <!-- Action Buttons (Responsive & Overflow-Safe) -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         <!-- Dark Mode Toggle Button -->
         <button id="themeToggleBtn" type="button" class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm active:scale-95 shrink-0" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
           <span id="themeToggleIcon" class="text-sm sm:text-base">🌙</span>
         </button>
 
         <!-- Data Backup Menu -->
-        <button id="backupBtn" type="button" class="h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm active:scale-95" title="Save or restore offline backup">
+        <button id="backupBtn" type="button" class="h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm active:scale-95 shrink-0" title="Save or restore offline backup">
           <span>💾</span>
           <span class="hidden md:inline">Backup</span>
         </button>
 
         <!-- Print Binder -->
-        <button id="printBtn" type="button" class="h-9 sm:h-10 px-2.5 sm:px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm active:scale-95">
+        <button id="printBtn" type="button" class="h-9 sm:h-10 px-2.5 sm:px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm active:scale-95 shrink-0">
           <span>🖨️</span>
           <span class="hidden lg:inline">Print Safe Binder</span>
           <span class="hidden sm:inline lg:hidden">Print</span>
@@ -133,211 +133,213 @@
   </div>
 
   <!-- ================= MAIN CONTENT ================= -->
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8 space-y-7">
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8 space-y-7 min-w-0">
 
     <!-- ================= 3-SECOND SNAPSHOT HERO ================= -->
-    <section class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200/90 dark:border-slate-800 p-6 md:p-8 shadow-sm transition-colors duration-200 no-print">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-6 border-b border-slate-100 dark:border-slate-800/80">
-        <div>
+    <section class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200/90 dark:border-slate-800 p-5 sm:p-6 md:p-8 shadow-sm transition-colors duration-200 no-print min-w-0">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-6 border-b border-slate-100 dark:border-slate-800/80 min-w-0">
+        <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2.5">
             <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider font-mono">⚡ Instant Family Status</span>
             <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Clean Slate</span>
           </div>
-          <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight mt-1.5 font-display" id="heroHeadline">
+          <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight mt-1.5 font-display break-words" id="heroHeadline">
             If Something Happens Tomorrow: You're <span id="scoreHeadlineSpan">0%</span> Ready
           </h1>
-          <p class="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-1.5 max-w-2xl leading-relaxed" id="heroSubtitle">
+          <p class="text-xs sm:text-sm md:text-base text-slate-500 dark:text-slate-400 mt-1.5 max-w-2xl leading-relaxed break-words" id="heroSubtitle">
             Your vault is completely private and saved in your local browser storage. Start by adding your first lifeline.
           </p>
         </div>
 
         <!-- Big Visual Gauge (Dynamic border & text color) -->
-        <div id="scoreGaugeBox" class="flex items-center gap-4 bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300">
-          <div class="text-4xl md:text-5xl font-black font-mono tracking-tight text-slate-400 dark:text-slate-500 transition-colors" id="scoreReadout">0%</div>
-          <div>
-            <span class="font-bold text-slate-900 dark:text-slate-100 block font-display text-sm md:text-base" id="scoreStatusLabel">⚪ Status: Clean Slate</span>
-            <span class="text-slate-500 dark:text-slate-400 text-xs md:text-sm" id="scoreDetailsLabel">0 Lifelines Added</span>
+        <div id="scoreGaugeBox" class="flex items-center gap-3.5 sm:gap-4 bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 px-4 sm:px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300 self-start md:self-auto">
+          <div class="text-3xl sm:text-4xl md:text-5xl font-black font-mono tracking-tight text-slate-400 dark:text-slate-500 transition-colors" id="scoreReadout">0%</div>
+          <div class="min-w-0">
+            <span class="font-bold text-slate-900 dark:text-slate-100 block font-display text-xs sm:text-sm md:text-base truncate" id="scoreStatusLabel">⚪ Status: Clean Slate</span>
+            <span class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs md:text-sm block truncate" id="scoreDetailsLabel">0 Lifelines Added</span>
           </div>
         </div>
       </div>
 
-      <!-- 4 Scannable Highlight Tiles (Clickable Shortcuts) -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 pt-6">
+      <!-- 4 Scannable Highlight Tiles (Clickable Shortcuts with Overflow Guardrails) -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-3.5 pt-5 sm:pt-6">
         
-        <div data-nav-tab="urgent" class="hero-tile p-4 rounded-2xl bg-rose-50/80 dark:bg-rose-950/25 border border-rose-100 dark:border-rose-900/50 flex items-center gap-3.5 cursor-pointer">
-          <div class="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 flex items-center justify-center text-2xl shadow-sm shrink-0">
+        <div data-nav-tab="urgent" class="hero-tile p-3 sm:p-4 rounded-2xl bg-rose-50/80 dark:bg-rose-950/25 border border-rose-100 dark:border-rose-900/50 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-w-0 overflow-hidden">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl sm:text-2xl shadow-sm shrink-0">
             🚨
           </div>
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 block font-mono">Hours 0–24</span>
-            <span class="text-base md:text-lg font-black text-slate-900 dark:text-white block font-display" id="tileUrgentCount">0 Actions</span>
-            <span class="text-xs font-semibold text-rose-600 dark:text-rose-400" id="tileUrgentSub">Immediate Priority</span>
+          <div class="min-w-0 flex-1 overflow-hidden">
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 block font-mono truncate">Hours 0–24</span>
+            <span class="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white block font-display truncate" id="tileUrgentCount">0 Actions</span>
+            <span class="text-[11px] sm:text-xs font-semibold text-rose-600 dark:text-rose-400 block truncate" id="tileUrgentSub">Immediate Priority</span>
           </div>
         </div>
 
-        <div data-nav-tab="finance" class="hero-tile p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/25 border border-blue-100 dark:border-blue-900/50 flex items-center gap-3.5 cursor-pointer">
-          <div class="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl shadow-sm shrink-0">
+        <div data-nav-tab="finance" class="hero-tile p-3 sm:p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/25 border border-blue-100 dark:border-blue-900/50 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-w-0 overflow-hidden">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl sm:text-2xl shadow-sm shrink-0">
             💰
           </div>
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 block font-mono">Money & Policies</span>
-            <span class="text-base md:text-lg font-black text-slate-900 dark:text-white block font-display" id="tileFinanceCount">0 Accounts</span>
-            <span class="text-xs font-semibold text-blue-600 dark:text-blue-400" id="tileFinanceSub">Policies & Banking</span>
+          <div class="min-w-0 flex-1 overflow-hidden">
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 block font-mono truncate">Money & Policies</span>
+            <span class="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white block font-display truncate" id="tileFinanceCount">0 Accounts</span>
+            <span class="text-[11px] sm:text-xs font-semibold text-blue-600 dark:text-blue-400 block truncate" id="tileFinanceSub">Policies & Banking</span>
           </div>
         </div>
 
-        <div data-nav-tab="home" class="hero-tile p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/25 border border-amber-100 dark:border-amber-900/50 flex items-center gap-3.5 cursor-pointer">
-          <div class="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl shadow-sm shrink-0">
+        <div data-nav-tab="home" class="hero-tile p-3 sm:p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/25 border border-amber-100 dark:border-amber-900/50 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-w-0 overflow-hidden">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl sm:text-2xl shadow-sm shrink-0">
             🚰
           </div>
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 block font-mono">Home & Shutoffs</span>
-            <span class="text-base md:text-lg font-black text-slate-900 dark:text-white block font-display" id="tileHomeCount">0 Specs</span>
-            <span class="text-xs font-semibold text-amber-600 dark:text-amber-400" id="tileHomeSub">Valves & Breakers</span>
+          <div class="min-w-0 flex-1 overflow-hidden">
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 block font-mono truncate">Home & Shutoffs</span>
+            <span class="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white block font-display truncate" id="tileHomeCount">0 Specs</span>
+            <span class="text-[11px] sm:text-xs font-semibold text-amber-600 dark:text-amber-400 block truncate" id="tileHomeSub">Valves & Breakers</span>
           </div>
         </div>
 
-        <div data-nav-tab="parents" class="hero-tile p-4 rounded-2xl bg-purple-50/80 dark:bg-purple-950/25 border border-purple-100 dark:border-purple-900/50 flex items-center gap-3.5 cursor-pointer">
-          <div class="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 flex items-center justify-center text-2xl shadow-sm shrink-0">
+        <div data-nav-tab="parents" class="hero-tile p-3 sm:p-4 rounded-2xl bg-purple-50/80 dark:bg-purple-950/25 border border-purple-100 dark:border-purple-900/50 flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-w-0 overflow-hidden">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl sm:text-2xl shadow-sm shrink-0">
             👵
           </div>
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400 block font-mono">Aging Parents</span>
-            <span class="text-base md:text-lg font-black text-slate-900 dark:text-white block font-display" id="tileParentsCount">0 Records</span>
-            <span class="text-xs font-semibold text-purple-600 dark:text-purple-400" id="tileParentsSub">Care & Protection</span>
+          <div class="min-w-0 flex-1 overflow-hidden">
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400 block font-mono truncate">Aging Parents</span>
+            <span class="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white block font-display truncate" id="tileParentsCount">0 Records</span>
+            <span class="text-[11px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400 block truncate" id="tileParentsSub">Care & Protection</span>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- ================= COLORFUL INTERACTIVE TABS ================= -->
-    <div class="flex items-center justify-between gap-3 no-print">
-      <div class="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-none flex-1">
-        <button data-tab="urgent" type="button" class="tab-chip active px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-rose-600 text-white shadow-md shadow-rose-600/20 whitespace-nowrap transition-all font-display">
+    <!-- ================= COLORFUL INTERACTIVE TABS (min-w-0 Flex Child Prevents Overflow) ================= -->
+    <div class="flex items-center justify-between gap-3 no-print min-w-0 w-full">
+      <div class="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-1.5 scrollbar-none flex-1 min-w-0">
+        <button data-tab="urgent" type="button" class="tab-chip active px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-rose-600 text-white shadow-md shadow-rose-600/20 whitespace-nowrap transition-all font-display shrink-0">
           <span class="text-base">🚨</span>
           <span>1. First 24 Hours</span>
         </button>
 
-        <button data-tab="finance" type="button" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
+        <button data-tab="finance" type="button" class="tab-chip px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display shrink-0">
           <span class="text-base">💳</span>
           <span>2. Money & Insurance</span>
         </button>
 
-        <button data-tab="home" type="button" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
+        <button data-tab="home" type="button" class="tab-chip px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display shrink-0">
           <span class="text-base">🏡</span>
           <span>3. Home & Shutoffs</span>
         </button>
 
-        <button data-tab="parents" type="button" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
+        <button data-tab="parents" type="button" class="tab-chip px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display shrink-0">
           <span class="text-base">👵</span>
           <span>4. Aging Parents Hub</span>
         </button>
 
-        <button data-tab="sitter" type="button" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
+        <button data-tab="sitter" type="button" class="tab-chip px-4 sm:px-4.5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display shrink-0">
           <span class="text-base">👶</span>
           <span>5. Sitter Pass (SMS)</span>
         </button>
       </div>
 
       <!-- Quick Template Options Toggle -->
-      <button id="templateMenuBtn" type="button" class="shrink-0 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-2" title="Reset or load sample data">
-        <span>⚙️ Options</span>
+      <button id="templateMenuBtn" type="button" class="shrink-0 text-xs sm:text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5 sm:gap-2" title="Reset or load sample data">
+        <span>⚙️</span>
+        <span class="hidden sm:inline">Options</span>
       </button>
     </div>
 
     <!-- ================= TAB PANELS ================= -->
 
     <!-- TAB 1: FIRST 24 HOURS (URGENT) -->
-    <section id="tab-urgent" class="tab-content space-y-4">
-      <div class="flex items-center justify-between pb-1.5 border-b border-rose-100 dark:border-rose-950/60">
-        <span class="text-sm font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-mono">🚨 What to do on Day 1 (Immediate Priority):</span>
-        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono" id="urgentTabCount">0 Actions</span>
+    <section id="tab-urgent" class="tab-content space-y-4 min-w-0">
+      <div class="flex items-center justify-between pb-1.5 border-b border-rose-100 dark:border-rose-950/60 min-w-0">
+        <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 font-mono truncate">🚨 What to do on Day 1 (Immediate Priority):</span>
+        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono shrink-0 ml-2" id="urgentTabCount">0 Actions</span>
       </div>
-      <div id="urgentGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div id="urgentGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 min-w-0">
         <!-- Rendered dynamically by app.js -->
       </div>
     </section>
 
     <!-- TAB 2: MONEY & INSURANCE -->
-    <section id="tab-finance" class="tab-content hidden space-y-4">
-      <div class="flex items-center justify-between pb-1.5 border-b border-blue-100 dark:border-blue-950/60">
-        <span class="text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono">💳 Bank Accounts & Insurance Lifelines:</span>
-        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono" id="financeTabCount">0 Accounts Mapped</span>
+    <section id="tab-finance" class="tab-content hidden space-y-4 min-w-0">
+      <div class="flex items-center justify-between pb-1.5 border-b border-blue-100 dark:border-blue-950/60 min-w-0">
+        <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono truncate">💳 Bank Accounts & Insurance Lifelines:</span>
+        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono shrink-0 ml-2" id="financeTabCount">0 Accounts Mapped</span>
       </div>
-      <div id="financeGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div id="financeGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 min-w-0">
         <!-- Rendered dynamically by app.js -->
       </div>
     </section>
 
     <!-- TAB 3: HOME & SHUTOFFS -->
-    <section id="tab-home" class="tab-content hidden space-y-4">
-      <div class="flex items-center justify-between pb-1.5 border-b border-amber-100 dark:border-amber-950/60">
-        <span class="text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 font-mono">🏡 Where Things Are In The House:</span>
-        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono" id="homeTabCount">0 Specs Saved</span>
+    <section id="tab-home" class="tab-content hidden space-y-4 min-w-0">
+      <div class="flex items-center justify-between pb-1.5 border-b border-amber-100 dark:border-amber-950/60 min-w-0">
+        <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 font-mono truncate">🏡 Where Things Are In The House:</span>
+        <span class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono shrink-0 ml-2" id="homeTabCount">0 Specs Saved</span>
       </div>
-      <div id="homeGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div id="homeGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 min-w-0">
         <!-- Rendered dynamically by app.js -->
       </div>
     </section>
 
     <!-- TAB 4: AGING PARENTS HUB -->
-    <section id="tab-parents" class="tab-content hidden space-y-4">
-      <div class="flex items-center justify-between pb-1.5 border-b border-purple-100 dark:border-purple-950/60">
-        <span class="text-sm font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 font-mono">👵 Aging Parents Medical & Protection:</span>
-        <span class="text-xs md:text-sm text-purple-700 dark:text-purple-300 font-bold bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-800">Sandwich Care Node</span>
+    <section id="tab-parents" class="tab-content hidden space-y-4 min-w-0">
+      <div class="flex items-center justify-between pb-1.5 border-b border-purple-100 dark:border-purple-950/60 min-w-0">
+        <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 font-mono truncate">👵 Aging Parents Medical & Protection:</span>
+        <span class="text-xs md:text-sm text-purple-700 dark:text-purple-300 font-bold bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-800 shrink-0 ml-2">Sandwich Care Node</span>
       </div>
-      <div id="parentsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div id="parentsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 min-w-0">
         <!-- Rendered dynamically by app.js -->
       </div>
     </section>
 
     <!-- TAB 5: SITTER PASS -->
-    <section id="tab-sitter" class="tab-content hidden space-y-4">
-      <div class="max-w-2xl mx-auto bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm space-y-5 transition-colors">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-          <div>
+    <section id="tab-sitter" class="tab-content hidden space-y-4 min-w-0">
+      <div class="max-w-2xl mx-auto bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 md:p-8 shadow-sm space-y-5 transition-colors min-w-0">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800 min-w-0">
+          <div class="min-w-0">
             <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-mono">👶 Caregiver Briefing</span>
-            <h3 class="text-lg md:text-xl font-black text-slate-900 dark:text-white font-display" id="sitterHeaderTitle">Babysitter & Caregiver Briefing</h3>
+            <h3 class="text-lg md:text-xl font-black text-slate-900 dark:text-white font-display truncate" id="sitterHeaderTitle">Babysitter & Caregiver Briefing</h3>
             <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Enter routines below and tap "Copy SMS" to text your caregiver in seconds.</p>
           </div>
-          <div class="flex items-center gap-2.5">
-            <button id="saveSitterBtn" type="button" class="px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-sm font-bold transition-all border border-emerald-200 dark:border-emerald-800 active:scale-95">
-              💾 Save Briefing
+          <div class="flex items-center gap-2.5 shrink-0">
+            <button id="saveSitterBtn" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-bold transition-all border border-emerald-200 dark:border-emerald-800 active:scale-95 shrink-0">
+              💾 Save
             </button>
-            <button id="copySitterAction" type="button" class="px-4.5 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 text-sm font-bold transition-all shadow-sm flex items-center gap-2 font-display active:scale-95">
-              <span>📋 Copy SMS</span>
+            <button id="copySitterAction" type="button" class="px-3.5 sm:px-4.5 py-2 sm:py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center gap-1.5 sm:gap-2 font-display active:scale-95 shrink-0">
+              <span>📋</span>
+              <span>Copy SMS</span>
             </button>
           </div>
         </div>
 
-        <div class="space-y-4.5 text-sm">
+        <div class="space-y-4.5 text-sm min-w-0">
           <!-- Children Names -->
-          <div>
+          <div class="min-w-0">
             <label for="sitterKidsInput" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Children & Ages</label>
             <input id="sitterKidsInput" type="text" maxlength="150" placeholder="e.g. Leo (Age 7) & Maya (Age 4)"
-              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words">
           </div>
 
           <!-- Allergy Box -->
-          <div>
+          <div class="min-w-0">
             <label for="sitterAllergiesInput" class="block font-bold text-rose-700 dark:text-rose-400 mb-1.5">⚠️ Allergies & Medications</label>
             <textarea id="sitterAllergiesInput" rows="2" maxlength="500" placeholder="e.g. Severe Peanut Allergy (EpiPen in kitchen cabinet above stove) or No known allergies."
-              class="w-full bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-rose-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-rose-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words"></textarea>
           </div>
 
           <!-- Contacts Box -->
-          <div>
+          <div class="min-w-0">
             <label for="sitterContactsInput" class="block font-bold text-blue-700 dark:text-blue-400 mb-1.5">📞 Emergency Phone Numbers</label>
             <textarea id="sitterContactsInput" rows="2" maxlength="500" placeholder="e.g. Parents: (555) 012-3456 / Pediatrician: Dr. Bennett (555) 902-1144"
-              class="w-full bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-blue-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-blue-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words"></textarea>
           </div>
 
           <!-- House & Bedtime Box -->
-          <div>
+          <div class="min-w-0">
             <label for="sitterHouseInput" class="block font-bold text-amber-700 dark:text-amber-400 mb-1.5">🏡 House Codes, Wi-Fi & Bedtimes</label>
             <textarea id="sitterHouseInput" rows="3" maxlength="600" placeholder="e.g. Front Door Code: #4829 • Wi-Fi: FamilyNet (Pass: SecretPass) • Bedtimes: 7:30 PM & 8:15 PM"
-              class="w-full bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-amber-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-amber-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words"></textarea>
           </div>
         </div>
       </div>
@@ -346,11 +348,11 @@
   </main>
 
   <!-- ================= ADD / EDIT RECORD MODAL ================= -->
-  <div id="recordModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 md:p-7 shadow-2xl relative animate-scaleUp">
-      <div class="flex items-center justify-between pb-3.5 mb-5 border-b border-slate-100 dark:border-slate-800">
-        <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display" id="modalHeading">Add New Household Lifeline</h3>
-        <button id="closeModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1" aria-label="Close dialog">✕</button>
+  <div id="recordModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
+    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-5 sm:p-6 md:p-7 shadow-2xl relative animate-scaleUp max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100 dark:border-slate-800 min-w-0">
+        <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display truncate" id="modalHeading">Add New Household Lifeline</h3>
+        <button id="closeModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1 shrink-0" aria-label="Close dialog">✕</button>
       </div>
 
       <input type="hidden" id="editRecordId" value="">
@@ -358,7 +360,7 @@
       <div class="space-y-4 text-sm">
         <div>
           <label for="cardCat" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Vault Category</label>
-          <select id="cardCat" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm">
+          <select id="cardCat" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm">
             <option value="urgent">🚨 First 24h Immediate Priority</option>
             <option value="finance">💳 Insurance, Accounts & Mortgages</option>
             <option value="home">🏡 Home Shutoff Valves & Specs</option>
@@ -369,35 +371,35 @@
         <div>
           <label for="cardBadge" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Badge Tag</label>
           <input id="cardBadge" type="text" maxlength="30" placeholder="e.g. CALL FIRST, LIFE POLICY, WATER, DPOA, CASH"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 uppercase placeholder:text-slate-400 dark:placeholder:text-slate-500">
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 uppercase placeholder:text-slate-400 dark:placeholder:text-slate-500">
         </div>
 
         <div>
           <label for="cardTitle" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Title / Name <span class="text-rose-500">*</span></label>
           <input id="cardTitle" type="text" maxlength="120" placeholder="e.g. Main Water Shutoff or Term Life Policy"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-bold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-display text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-bold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-display text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
         </div>
 
         <div>
           <label for="cardRef" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Account #, Phone, or Exact Location</label>
           <input id="cardRef" type="text" maxlength="100" placeholder="e.g. Policy # 7749201 or Basement North Wall"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-mono text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-mono text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
         </div>
 
         <div>
           <label for="cardNotes" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Instructions for Next-of-Kin</label>
           <textarea id="cardNotes" rows="3" maxlength="800" placeholder="Step-by-step guidance, safe combinations, contacts, or draft dates..."
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 sm:px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 break-words"></textarea>
         </div>
       </div>
 
-      <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <button id="deleteRecordModalBtn" type="button" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-bold text-sm hidden active:scale-95">
+      <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+        <button id="deleteRecordModalBtn" type="button" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-bold text-xs sm:text-sm hidden active:scale-95 shrink-0">
           🗑️ Delete Record
         </button>
-        <div class="flex items-center gap-2.5 ml-auto">
-          <button id="cancelModal" type="button" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">Cancel</button>
-          <button id="saveCardBtn" type="button" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-md shadow-indigo-600/20 font-display active:scale-95">
+        <div class="flex items-center gap-2 sm:gap-2.5 ml-auto shrink-0">
+          <button id="cancelModal" type="button" class="px-3.5 sm:px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-xs sm:text-sm active:scale-95">Cancel</button>
+          <button id="saveCardBtn" type="button" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/20 font-display active:scale-95">
             Save to Vault
           </button>
         </div>
@@ -406,8 +408,8 @@
   </div>
 
   <!-- ================= FAMILY NAME MODAL ================= -->
-  <div id="familyNameModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-6 shadow-2xl relative animate-scaleUp">
+  <div id="familyNameModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
+    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-5 sm:p-6 shadow-2xl relative animate-scaleUp">
       <h3 class="text-base font-black text-slate-900 dark:text-white font-display mb-1">Set Household Name</h3>
       <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-4">This name will appear on all digital views and printed binders.</p>
       
@@ -416,7 +418,7 @@
 
       <div class="flex justify-end gap-2.5">
         <button id="cancelFamilyBtn" type="button" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">Cancel</button>
-        <button id="saveFamilyBtn" type="button" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm font-display active:scale-95">
+        <button id="saveFamilyBtn" type="button" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm font-display active:scale-95">
           Save Name
         </button>
       </div>
@@ -424,23 +426,23 @@
   </div>
 
   <!-- ================= BACKUP / RESTORE MODAL ================= -->
-  <div id="backupModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl relative space-y-4.5 animate-scaleUp">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-        <div>
-          <h3 class="text-base font-black text-slate-900 dark:text-white font-display">Offline Vault Storage & Backup</h3>
+  <div id="backupModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
+    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-5 sm:p-6 shadow-2xl relative space-y-4 animate-scaleUp max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 min-w-0">
+        <div class="min-w-0">
+          <h3 class="text-base font-black text-slate-900 dark:text-white font-display truncate">Offline Vault Storage & Backup</h3>
           <p class="text-xs text-slate-500 dark:text-slate-400">Your data never touches the cloud. Keep your own backups.</p>
         </div>
-        <button id="closeBackupModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1" aria-label="Close dialog">✕</button>
+        <button id="closeBackupModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1 shrink-0" aria-label="Close dialog">✕</button>
       </div>
 
       <!-- Export -->
-      <div class="p-4.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-2.5">
+      <div class="p-4 sm:p-4.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-2.5">
         <div class="flex items-center gap-2">
           <span class="text-xl">💾</span>
           <h4 class="text-sm font-black text-indigo-950 dark:text-indigo-200 font-display">Export Encrypted Backup (.json)</h4>
         </div>
-        <p class="text-xs md:text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed">
+        <p class="text-xs md:text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed break-words">
           Downloads your complete household vault to a single file. Store on a safe USB drive or external drive.
         </p>
         <button id="downloadBackupBtn" type="button" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-all shadow-sm font-display active:scale-95">
@@ -449,12 +451,12 @@
       </div>
 
       <!-- Import -->
-      <div class="p-4.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5">
+      <div class="p-4 sm:p-4.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5">
         <div class="flex items-center gap-2">
           <span class="text-xl">📥</span>
           <h4 class="text-sm font-black text-slate-900 dark:text-slate-100 font-display">Restore from Backup (.json)</h4>
         </div>
-        <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed break-words">
           Select an Ark backup file to restore your vault onto this computer or browser.
         </p>
         <input type="file" id="importFileInput" accept=".json" class="hidden">
@@ -472,26 +474,26 @@
   </div>
 
   <!-- ================= TEMPLATE OPTIONS MODAL ================= -->
-  <div id="templateModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-6 shadow-2xl relative space-y-4.5 animate-scaleUp">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-        <h3 class="text-base font-black text-slate-900 dark:text-white font-display">Template Options</h3>
-        <button id="closeTemplateModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1" aria-label="Close dialog">✕</button>
+  <div id="templateModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden no-print">
+    <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-5 sm:p-6 shadow-2xl relative space-y-4 animate-scaleUp">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 min-w-0">
+        <h3 class="text-base font-black text-slate-900 dark:text-white font-display truncate">Template Options</h3>
+        <button id="closeTemplateModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1 shrink-0" aria-label="Close dialog">✕</button>
       </div>
 
-      <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+      <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed break-words">
         Reset your vault to a clean blank state, or explore with the pre-filled Miller Family demo records.
       </p>
 
       <div class="space-y-3">
         <button id="clearToBlankBtn" type="button" class="w-full text-left p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-900/60 transition-colors active:scale-95">
           <div class="text-sm font-bold text-rose-800 dark:text-rose-300 font-display">🧹 Clear All to Clean Slate</div>
-          <div class="text-xs text-rose-600 dark:text-rose-400 mt-1 leading-relaxed">Clears all cards and resets the vault to clean blank state.</div>
+          <div class="text-xs text-rose-600 dark:text-rose-400 mt-1 leading-relaxed break-words">Clears all cards and resets the vault to clean blank state.</div>
         </button>
 
         <button id="loadSampleDataBtn" type="button" class="w-full text-left p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/50 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors active:scale-95">
           <div class="text-sm font-bold text-slate-800 dark:text-slate-200 font-display">✨ Load Demo Example Records</div>
-          <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Populates the vault with demo records so you can see how it works.</div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed break-words">Populates the vault with demo records so you can see how it works.</div>
         </button>
       </div>
 
@@ -504,16 +506,16 @@
   </div>
 
   <!-- Toast Notification (Elevated z-index z-[60]) -->
-  <div id="toast" class="fixed bottom-6 right-6 z-[60] px-5 py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold shadow-2xl transition-all transform translate-y-16 opacity-0 pointer-events-none flex items-center gap-2.5 no-print font-display">
-    <span class="text-base">✨</span>
-    <span id="toastMsg">Action completed!</span>
+  <div id="toast" class="fixed bottom-6 right-6 z-[60] px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs sm:text-sm font-bold shadow-2xl transition-all transform translate-y-16 opacity-0 pointer-events-none flex items-center gap-2.5 no-print font-display max-w-[90vw] break-words">
+    <span class="text-base shrink-0">✨</span>
+    <span id="toastMsg" class="break-words">Action completed!</span>
   </div>
 
   <!-- Footer -->
-  <footer class="w-full bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-800 py-4.5 px-6 text-center text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono transition-colors duration-200 no-print">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
-      <div>Ark Vault • Digital Edition • 100% Offline Local Storage</div>
-      <div class="flex items-center gap-3">
+  <footer class="w-full bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-800 py-4 px-4 sm:px-6 text-center text-xs md:text-sm text-slate-500 dark:text-slate-400 font-mono transition-colors duration-200 no-print">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 min-w-0">
+      <div class="truncate">Ark Vault • Digital Edition • 100% Offline Local Storage</div>
+      <div class="flex items-center gap-3 shrink-0">
         <span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon inline-block"></span>
           System Status: Fully Private

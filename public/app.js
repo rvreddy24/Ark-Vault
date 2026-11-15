@@ -277,41 +277,41 @@ function getBadgeColors(cat) {
   }
 }
 
-// Create dynamic card element with enhanced typography & non-collapsing lines
+// Create dynamic card element with enhanced typography, non-collapsing lines & overflow protection
 function createCardElement(cat, item, index = 0) {
   const colors = getBadgeColors(cat);
   const card = document.createElement('div');
-  card.className = 'card-item bg-white dark:bg-[#101726] rounded-2xl border border-slate-200 dark:border-slate-800/90 p-5 shadow-sm hover:shadow-md dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-3.5';
+  card.className = 'card-item bg-white dark:bg-[#101726] rounded-2xl border border-slate-200 dark:border-slate-800/90 p-4 sm:p-5 shadow-sm hover:shadow-md dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-3.5 min-w-0 overflow-hidden break-words';
   card.style.animationDelay = `${index * 0.05}s`;
   card.dataset.id = item.id;
   card.dataset.cat = cat;
 
   const notesHtml = (item.notes || 'No extra notes recorded.')
     .split('\n')
-    .map(line => line.trim() ? `<div>${escapeHtml(line)}</div>` : `<div class="h-1.5"></div>`)
+    .map(line => line.trim() ? `<div class="break-words overflow-hidden">${escapeHtml(line)}</div>` : `<div class="h-1.5"></div>`)
     .join('');
 
   card.innerHTML = `
-    <div>
-      <div class="flex items-center justify-between mb-2.5">
-        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${colors.bg} ${colors.text} border ${colors.border} font-mono uppercase tracking-wider">
+    <div class="min-w-0">
+      <div class="flex items-center justify-between mb-2.5 gap-2 min-w-0">
+        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${colors.bg} ${colors.text} border ${colors.border} font-mono uppercase tracking-wider truncate max-w-[65%] shrink-0">
           ${escapeHtml(item.badge || 'LIFELINE')}
         </span>
-        <button type="button" class="toggle-verify-btn text-xs sm:text-sm font-bold ${item.verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} hover:opacity-80 transition-all flex items-center gap-1.5 font-display" title="Toggle verification status">
+        <button type="button" class="toggle-verify-btn text-xs sm:text-sm font-bold ${item.verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} hover:opacity-80 transition-all flex items-center gap-1.5 font-display shrink-0" title="Toggle verification status">
           ${item.verified ? '✓ VERIFIED' : '⚪ UNVERIFIED'}
         </button>
       </div>
-      <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display leading-snug">${escapeHtml(item.title)}</h3>
-      <p class="text-xs md:text-sm font-mono font-medium text-slate-500 dark:text-slate-400 mt-1">${escapeHtml(item.ref || 'No identifier recorded')}</p>
-      <div class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs md:text-sm text-slate-700 dark:text-slate-300 space-y-1 font-sans leading-relaxed">
+      <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display leading-snug break-words overflow-hidden">${escapeHtml(item.title)}</h3>
+      <p class="text-xs md:text-sm font-mono font-medium text-slate-500 dark:text-slate-400 mt-1 break-all overflow-hidden">${escapeHtml(item.ref || 'No identifier recorded')}</p>
+      <div class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs md:text-sm text-slate-700 dark:text-slate-300 space-y-1 font-sans leading-relaxed break-words overflow-hidden">
         ${notesHtml}
       </div>
     </div>
-    <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between no-print">
-      <button type="button" class="edit-btn text-xs md:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-display active:scale-95 transition-transform">
+    <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between no-print gap-2">
+      <button type="button" class="edit-btn text-xs md:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-display active:scale-95 transition-transform shrink-0">
         ✏️ Edit
       </button>
-      <button type="button" class="delete-btn text-xs md:text-sm font-bold text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-display active:scale-95 transition-transform">
+      <button type="button" class="delete-btn text-xs md:text-sm font-bold text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-display active:scale-95 transition-transform shrink-0">
         🗑️ Delete
       </button>
     </div>
