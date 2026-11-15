@@ -611,6 +611,15 @@ saveSitterBtn.addEventListener('click', () => {
 });
 
 copySitterAction.addEventListener('click', () => {
+  // Sync latest inputs into state before copying
+  vaultState.sitter = {
+    kids: document.getElementById('sitterKidsInput').value.trim(),
+    allergies: document.getElementById('sitterAllergiesInput').value.trim(),
+    contacts: document.getElementById('sitterContactsInput').value.trim(),
+    house: document.getElementById('sitterHouseInput').value.trim()
+  };
+  saveState();
+
   const s = vaultState.sitter || {};
   const kids = s.kids || "Children";
   const allergies = s.allergies || "None recorded.";
@@ -715,6 +724,8 @@ importFileInput.addEventListener('change', (e) => {
       }
     } catch (err) {
       alert("Error reading backup file: Invalid JSON format.");
+    } finally {
+      importFileInput.value = '';
     }
   };
   reader.readAsText(file);
@@ -766,6 +777,51 @@ document.getElementById('printBtn').addEventListener('click', () => {
   setTimeout(() => {
     window.print();
   }, 250);
+});
+
+// Ensure print layout de-darkens to pure black-on-white regardless of active theme
+window.addEventListener('beforeprint', () => {
+  document.getElementById('printDateSpan').innerText = new Date().toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  document.documentElement.classList.remove('dark');
+});
+
+window.addEventListener('afterprint', () => {
+  const saved = localStorage.getItem(THEME_KEY);
+  const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (saved === 'dark' || (!saved && systemDark)) {
+    document.documentElement.classList.add('dark');
+  }
+});
+
+// Modal Accessibility: Close modals on Escape key
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeRecordModal();
+    familyNameModal.classList.add('hidden');
+    backupModal.classList.add('hidden');
+    templateModal.classList.add('hidden');
+  }
+});
+
+// Close modals when clicking the dim backdrop
+[recordModal, familyNameModal, backupModal, templateModal].forEach(modal => {
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+    }
+  });
+});
+
+// Interactive Hero Tile navigation
+document.querySelectorAll('[data-nav-tab]').forEach(tile => {
+  tile.addEventListener('click', () => {
+    const tabName = tile.dataset.navTab;
+    document.querySelector(`[data-tab="${tabName}"]`)?.click();
+  });
 });
 
 // Initial boot

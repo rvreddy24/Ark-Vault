@@ -1,26 +1,62 @@
 /* Ark Vault Colorful & Scannable Design System */
 
 @media print {
-  html, body, .dark, body.dark {
-    background: white !important;
-    color: black !important;
+  /* Force light mode regardless of user theme to save printer ink */
+  html, body, .dark, body.dark, html.dark {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
   }
-  header, footer, .tab-chip, #addCardBtn, #printBtn, #themeToggleBtn, #backupBtn, #templateMenuBtn, #recordModal, #toast, .no-print {
+
+  /* De-darken all text and backgrounds */
+  .dark, .dark * {
+    color: #000000 !important;
+    background-color: transparent !important;
+    border-color: #cbd5e1 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  header, footer, .tab-chip, #addCardBtn, #printBtn, #themeToggleBtn, #backupBtn, #templateMenuBtn, #recordModal, #familyNameModal, #backupModal, #templateModal, #toast, .no-print {
     display: none !important;
   }
+
   .print-only {
     display: block !important;
   }
+
   .tab-content {
     display: block !important;
     page-break-after: auto;
   }
+
   .card-item {
     break-inside: avoid;
+    page-break-inside: avoid;
     border: 1px solid #cbd5e1 !important;
     box-shadow: none !important;
-    background: white !important;
-    color: black !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .card-item * {
+    color: #000000 !important;
+    background: transparent !important;
+  }
+
+  .card-item span {
+    border: 1px solid #cbd5e1 !important;
+    background: #f8fafc !important;
+    color: #000000 !important;
+  }
+
+  /* Sitter input styling for physical binder print */
+  input, textarea {
+    border: 1px solid #cbd5e1 !important;
+    background: transparent !important;
+    color: #000000 !important;
+    resize: none !important;
   }
 }
 
