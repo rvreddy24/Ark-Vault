@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ark Vault • Private Family Continuity OS</title>
 
+  <!-- SVG Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+
   <!-- Google Fonts: Inter (Body/UI) + Outfit (Headings) + JetBrains Mono (Numbers/Keys) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,24 +59,24 @@
 
   <!-- ================= TOP NAVIGATION ================= -->
   <header class="w-full bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-sm transition-colors duration-200 no-print">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-18 py-3.5 flex items-center justify-between gap-4">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
       
       <!-- Brand & Editable Family Name -->
-      <div class="flex items-center gap-3.5">
-        <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-md shadow-indigo-600/20 shrink-0 transform hover:scale-105 transition-transform duration-200">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl sm:text-2xl shadow-md shadow-indigo-600/20 shrink-0 transform hover:scale-105 transition-transform duration-200">
           🛡️
         </div>
         <div>
-          <div class="flex items-center gap-2.5">
-            <span class="text-lg md:text-xl font-black tracking-tight text-slate-900 dark:text-white font-display">Ark Vault</span>
-            <button id="editFamilyBtn" title="Click to edit Family Name" class="group flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-all hover:scale-[1.02] active:scale-95">
-              <span id="familyNameDisplay">My Family Vault</span>
+          <div class="flex items-center gap-2">
+            <span class="text-base sm:text-lg md:text-xl font-black tracking-tight text-slate-900 dark:text-white font-display">Ark Vault</span>
+            <button id="editFamilyBtn" type="button" title="Click to edit Family Name" class="group flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-all hover:scale-[1.02] active:scale-95">
+              <span id="familyNameDisplay" class="truncate max-w-[130px] sm:max-w-none">My Family Vault</span>
               <span class="text-xs opacity-60 group-hover:opacity-100">✏️</span>
             </button>
           </div>
-          <div class="flex items-center gap-2 text-xs md:text-[13px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-            <span>Offline Client Vault</span>
-            <span class="text-slate-300 dark:text-slate-600">•</span>
+          <div class="flex items-center gap-2 text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+            <span class="hidden sm:inline">Offline Client Vault</span>
+            <span class="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
             <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-beacon inline-block"></span>
               100% Private (No Cloud)
@@ -82,26 +85,31 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-2.5">
+      <!-- Action Buttons (Responsive Sizing) -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5">
         <!-- Dark Mode Toggle Button -->
-        <button id="themeToggleBtn" class="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm active:scale-95" title="Toggle Dark/Light Mode">
-          <span id="themeToggleIcon" class="text-base">🌙</span>
+        <button id="themeToggleBtn" type="button" class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm active:scale-95 shrink-0" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
+          <span id="themeToggleIcon" class="text-sm sm:text-base">🌙</span>
         </button>
 
         <!-- Data Backup Menu -->
-        <button id="backupBtn" class="h-10 px-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-sm font-bold transition-all flex items-center gap-2 shadow-sm active:scale-95" title="Save or restore offline backup">
-          <span>💾 Backup</span>
+        <button id="backupBtn" type="button" class="h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm active:scale-95" title="Save or restore offline backup">
+          <span>💾</span>
+          <span class="hidden md:inline">Backup</span>
         </button>
 
         <!-- Print Binder -->
-        <button id="printBtn" class="h-10 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-sm font-bold transition-all flex items-center gap-2 shadow-sm active:scale-95">
-          <span>🖨️ Print Safe Binder</span>
+        <button id="printBtn" type="button" class="h-9 sm:h-10 px-2.5 sm:px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm active:scale-95">
+          <span>🖨️</span>
+          <span class="hidden lg:inline">Print Safe Binder</span>
+          <span class="hidden sm:inline lg:hidden">Print</span>
         </button>
 
         <!-- Add Record -->
-        <button id="addCardBtn" class="h-10 px-4.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-all shadow-md shadow-indigo-600/25 flex items-center gap-2 shrink-0 active:scale-95 font-display">
-          <span>➕ Add Record</span>
+        <button id="addCardBtn" type="button" class="h-9 sm:h-10 px-3 sm:px-4.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold transition-all shadow-md shadow-indigo-600/25 flex items-center gap-1.5 sm:gap-2 shrink-0 active:scale-95 font-display">
+          <span>➕</span>
+          <span class="hidden sm:inline">Add Record</span>
+          <span class="sm:hidden">Add</span>
         </button>
       </div>
 
@@ -143,12 +151,12 @@
           </p>
         </div>
 
-        <!-- Big Visual Gauge -->
-        <div class="flex items-center gap-4 bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm">
-          <div class="text-4xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400 font-mono tracking-tight" id="scoreReadout">0%</div>
+        <!-- Big Visual Gauge (Dynamic border & text color) -->
+        <div id="scoreGaugeBox" class="flex items-center gap-4 bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300">
+          <div class="text-4xl md:text-5xl font-black font-mono tracking-tight text-slate-400 dark:text-slate-500 transition-colors" id="scoreReadout">0%</div>
           <div>
-            <span class="font-bold text-slate-900 dark:text-slate-100 block font-display text-sm md:text-base" id="scoreStatusLabel">⚪ Status: Not Started</span>
-            <span class="text-slate-500 dark:text-slate-400 text-xs md:text-sm" id="scoreDetailsLabel">0 Lifelines Verified</span>
+            <span class="font-bold text-slate-900 dark:text-slate-100 block font-display text-sm md:text-base" id="scoreStatusLabel">⚪ Status: Clean Slate</span>
+            <span class="text-slate-500 dark:text-slate-400 text-xs md:text-sm" id="scoreDetailsLabel">0 Lifelines Added</span>
           </div>
         </div>
       </div>
@@ -206,34 +214,34 @@
     <!-- ================= COLORFUL INTERACTIVE TABS ================= -->
     <div class="flex items-center justify-between gap-3 no-print">
       <div class="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-none flex-1">
-        <button data-tab="urgent" class="tab-chip active px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-rose-600 text-white shadow-md shadow-rose-600/20 whitespace-nowrap transition-all font-display">
+        <button data-tab="urgent" type="button" class="tab-chip active px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-rose-600 text-white shadow-md shadow-rose-600/20 whitespace-nowrap transition-all font-display">
           <span class="text-base">🚨</span>
           <span>1. First 24 Hours</span>
         </button>
 
-        <button data-tab="finance" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
+        <button data-tab="finance" type="button" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
           <span class="text-base">💳</span>
           <span>2. Money & Insurance</span>
         </button>
 
-        <button data-tab="home" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
+        <button data-tab="home" type="button" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
           <span class="text-base">🏡</span>
           <span>3. Home & Shutoffs</span>
         </button>
 
-        <button data-tab="parents" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
+        <button data-tab="parents" type="button" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
           <span class="text-base">👵</span>
           <span>4. Aging Parents Hub</span>
         </button>
 
-        <button data-tab="sitter" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
+        <button data-tab="sitter" type="button" class="tab-chip px-4.5 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display">
           <span class="text-base">👶</span>
           <span>5. Sitter Pass (SMS)</span>
         </button>
       </div>
 
       <!-- Quick Template Options Toggle -->
-      <button id="templateMenuBtn" class="shrink-0 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-2" title="Reset or load sample data">
+      <button id="templateMenuBtn" type="button" class="shrink-0 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-2" title="Reset or load sample data">
         <span>⚙️ Options</span>
       </button>
     </div>
@@ -294,10 +302,10 @@
             <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Enter routines below and tap "Copy SMS" to text your caregiver in seconds.</p>
           </div>
           <div class="flex items-center gap-2.5">
-            <button id="saveSitterBtn" class="px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-sm font-bold transition-all border border-emerald-200 dark:border-emerald-800 active:scale-95">
+            <button id="saveSitterBtn" type="button" class="px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-sm font-bold transition-all border border-emerald-200 dark:border-emerald-800 active:scale-95">
               💾 Save Briefing
             </button>
-            <button id="copySitterAction" class="px-4.5 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 text-sm font-bold transition-all shadow-sm flex items-center gap-2 font-display active:scale-95">
+            <button id="copySitterAction" type="button" class="px-4.5 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 text-sm font-bold transition-all shadow-sm flex items-center gap-2 font-display active:scale-95">
               <span>📋 Copy SMS</span>
             </button>
           </div>
@@ -306,30 +314,30 @@
         <div class="space-y-4.5 text-sm">
           <!-- Children Names -->
           <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Children & Ages</label>
-            <input id="sitterKidsInput" type="text" placeholder="e.g. Leo (Age 7) & Maya (Age 4)"
-              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm">
+            <label for="sitterKidsInput" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Children & Ages</label>
+            <input id="sitterKidsInput" type="text" maxlength="150" placeholder="e.g. Leo (Age 7) & Maya (Age 4)"
+              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
           </div>
 
           <!-- Allergy Box -->
           <div>
-            <label class="block font-bold text-rose-700 dark:text-rose-400 mb-1.5">⚠️ Allergies & Medications</label>
-            <textarea id="sitterAllergiesInput" rows="2" placeholder="e.g. Severe Peanut Allergy (EpiPen in kitchen cabinet above stove) or No known allergies."
-              class="w-full bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-rose-400 resize-none text-sm"></textarea>
+            <label for="sitterAllergiesInput" class="block font-bold text-rose-700 dark:text-rose-400 mb-1.5">⚠️ Allergies & Medications</label>
+            <textarea id="sitterAllergiesInput" rows="2" maxlength="500" placeholder="e.g. Severe Peanut Allergy (EpiPen in kitchen cabinet above stove) or No known allergies."
+              class="w-full bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-rose-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
           </div>
 
           <!-- Contacts Box -->
           <div>
-            <label class="block font-bold text-blue-700 dark:text-blue-400 mb-1.5">📞 Emergency Phone Numbers</label>
-            <textarea id="sitterContactsInput" rows="2" placeholder="e.g. Parents: (555) 012-3456 / Pediatrician: Dr. Bennett (555) 902-1144"
-              class="w-full bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-blue-400 resize-none text-sm"></textarea>
+            <label for="sitterContactsInput" class="block font-bold text-blue-700 dark:text-blue-400 mb-1.5">📞 Emergency Phone Numbers</label>
+            <textarea id="sitterContactsInput" rows="2" maxlength="500" placeholder="e.g. Parents: (555) 012-3456 / Pediatrician: Dr. Bennett (555) 902-1144"
+              class="w-full bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-blue-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
           </div>
 
           <!-- House & Bedtime Box -->
           <div>
-            <label class="block font-bold text-amber-700 dark:text-amber-400 mb-1.5">🏡 House Codes, Wi-Fi & Bedtimes</label>
-            <textarea id="sitterHouseInput" rows="3" placeholder="e.g. Front Door Code: #4829 • Wi-Fi: FamilyNet (Pass: SecretPass) • Bedtimes: 7:30 PM & 8:15 PM"
-              class="w-full bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-amber-400 resize-none text-sm"></textarea>
+            <label for="sitterHouseInput" class="block font-bold text-amber-700 dark:text-amber-400 mb-1.5">🏡 House Codes, Wi-Fi & Bedtimes</label>
+            <textarea id="sitterHouseInput" rows="3" maxlength="600" placeholder="e.g. Front Door Code: #4829 • Wi-Fi: FamilyNet (Pass: SecretPass) • Bedtimes: 7:30 PM & 8:15 PM"
+              class="w-full bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/60 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-amber-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
           </div>
         </div>
       </div>
@@ -342,14 +350,14 @@
     <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 md:p-7 shadow-2xl relative animate-scaleUp">
       <div class="flex items-center justify-between pb-3.5 mb-5 border-b border-slate-100 dark:border-slate-800">
         <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display" id="modalHeading">Add New Household Lifeline</h3>
-        <button id="closeModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1">✕</button>
+        <button id="closeModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1" aria-label="Close dialog">✕</button>
       </div>
 
       <input type="hidden" id="editRecordId" value="">
 
       <div class="space-y-4 text-sm">
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Vault Category</label>
+          <label for="cardCat" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Vault Category</label>
           <select id="cardCat" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-sm">
             <option value="urgent">🚨 First 24h Immediate Priority</option>
             <option value="finance">💳 Insurance, Accounts & Mortgages</option>
@@ -359,37 +367,37 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Badge Tag</label>
-          <input id="cardBadge" type="text" placeholder="e.g. CALL FIRST, LIFE POLICY, WATER, DPOA, CASH"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 uppercase">
+          <label for="cardBadge" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Badge Tag</label>
+          <input id="cardBadge" type="text" maxlength="30" placeholder="e.g. CALL FIRST, LIFE POLICY, WATER, DPOA, CASH"
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 uppercase placeholder:text-slate-400 dark:placeholder:text-slate-500">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Title / Name</label>
-          <input id="cardTitle" type="text" placeholder="e.g. Main Water Shutoff or Term Life Policy"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-bold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-display text-sm">
+          <label for="cardTitle" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Title / Name <span class="text-rose-500">*</span></label>
+          <input id="cardTitle" type="text" maxlength="120" placeholder="e.g. Main Water Shutoff or Term Life Policy"
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-bold focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-display text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Account #, Phone, or Exact Location</label>
-          <input id="cardRef" type="text" placeholder="e.g. Policy # 7749201 or Basement North Wall"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-mono text-sm">
+          <label for="cardRef" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Account #, Phone, or Exact Location</label>
+          <input id="cardRef" type="text" maxlength="100" placeholder="e.g. Policy # 7749201 or Basement North Wall"
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-mono text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Instructions for Next-of-Kin</label>
-          <textarea id="cardNotes" rows="3" placeholder="Step-by-step guidance, safe combinations, contacts, or draft dates..."
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 resize-none text-sm"></textarea>
+          <label for="cardNotes" class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Instructions for Next-of-Kin</label>
+          <textarea id="cardNotes" rows="3" maxlength="800" placeholder="Step-by-step guidance, safe combinations, contacts, or draft dates..."
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-800 dark:text-slate-100 font-medium focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 resize-none text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
         </div>
       </div>
 
       <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <button id="deleteRecordModalBtn" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-bold text-sm hidden active:scale-95">
+        <button id="deleteRecordModalBtn" type="button" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-bold text-sm hidden active:scale-95">
           🗑️ Delete Record
         </button>
         <div class="flex items-center gap-2.5 ml-auto">
-          <button id="cancelModal" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">Cancel</button>
-          <button id="saveCardBtn" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-md shadow-indigo-600/20 font-display active:scale-95">
+          <button id="cancelModal" type="button" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">Cancel</button>
+          <button id="saveCardBtn" type="button" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-md shadow-indigo-600/20 font-display active:scale-95">
             Save to Vault
           </button>
         </div>
@@ -403,12 +411,12 @@
       <h3 class="text-base font-black text-slate-900 dark:text-white font-display mb-1">Set Household Name</h3>
       <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-4">This name will appear on all digital views and printed binders.</p>
       
-      <input id="familyNameInput" type="text" placeholder="e.g. The Davis Family"
+      <input id="familyNameInput" type="text" maxlength="80" placeholder="e.g. The Davis Family"
         class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-slate-100 font-bold text-sm md:text-base focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 mb-4 font-display">
 
       <div class="flex justify-end gap-2.5">
-        <button id="cancelFamilyBtn" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">Cancel</button>
-        <button id="saveFamilyBtn" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm font-display active:scale-95">
+        <button id="cancelFamilyBtn" type="button" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">Cancel</button>
+        <button id="saveFamilyBtn" type="button" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm font-display active:scale-95">
           Save Name
         </button>
       </div>
@@ -423,7 +431,7 @@
           <h3 class="text-base font-black text-slate-900 dark:text-white font-display">Offline Vault Storage & Backup</h3>
           <p class="text-xs text-slate-500 dark:text-slate-400">Your data never touches the cloud. Keep your own backups.</p>
         </div>
-        <button id="closeBackupModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1">✕</button>
+        <button id="closeBackupModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1" aria-label="Close dialog">✕</button>
       </div>
 
       <!-- Export -->
@@ -435,7 +443,7 @@
         <p class="text-xs md:text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed">
           Downloads your complete household vault to a single file. Store on a safe USB drive or external drive.
         </p>
-        <button id="downloadBackupBtn" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-all shadow-sm font-display active:scale-95">
+        <button id="downloadBackupBtn" type="button" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-all shadow-sm font-display active:scale-95">
           Download ark-backup.json
         </button>
       </div>
@@ -450,13 +458,13 @@
           Select an Ark backup file to restore your vault onto this computer or browser.
         </p>
         <input type="file" id="importFileInput" accept=".json" class="hidden">
-        <button id="triggerImportBtn" class="w-full py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm font-bold transition-all shadow-sm font-display active:scale-95">
+        <button id="triggerImportBtn" type="button" class="w-full py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm font-bold transition-all shadow-sm font-display active:scale-95">
           Select Backup File to Restore
         </button>
       </div>
 
       <div class="text-right">
-        <button id="doneBackupBtn" class="px-5 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">
+        <button id="doneBackupBtn" type="button" class="px-5 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">
           Close
         </button>
       </div>
@@ -468,7 +476,7 @@
     <div class="bg-white dark:bg-[#101726] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-6 shadow-2xl relative space-y-4.5 animate-scaleUp">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
         <h3 class="text-base font-black text-slate-900 dark:text-white font-display">Template Options</h3>
-        <button id="closeTemplateModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1">✕</button>
+        <button id="closeTemplateModal" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl p-1" aria-label="Close dialog">✕</button>
       </div>
 
       <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -476,27 +484,27 @@
       </p>
 
       <div class="space-y-3">
-        <button id="clearToBlankBtn" class="w-full text-left p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-900/60 transition-colors active:scale-95">
+        <button id="clearToBlankBtn" type="button" class="w-full text-left p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-900/60 transition-colors active:scale-95">
           <div class="text-sm font-bold text-rose-800 dark:text-rose-300 font-display">🧹 Clear All to Clean Slate</div>
           <div class="text-xs text-rose-600 dark:text-rose-400 mt-1 leading-relaxed">Clears all cards and resets the vault to clean blank state.</div>
         </button>
 
-        <button id="loadSampleDataBtn" class="w-full text-left p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/50 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors active:scale-95">
+        <button id="loadSampleDataBtn" type="button" class="w-full text-left p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/50 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors active:scale-95">
           <div class="text-sm font-bold text-slate-800 dark:text-slate-200 font-display">✨ Load Demo Example Records</div>
           <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Populates the vault with demo records so you can see how it works.</div>
         </button>
       </div>
 
       <div class="text-right pt-2">
-        <button id="cancelTemplateBtn" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">
+        <button id="cancelTemplateBtn" type="button" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-sm active:scale-95">
           Cancel
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold shadow-2xl transition-all transform translate-y-16 opacity-0 pointer-events-none flex items-center gap-2.5 no-print font-display">
+  <!-- Toast Notification (Elevated z-index z-[60]) -->
+  <div id="toast" class="fixed bottom-6 right-6 z-[60] px-5 py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold shadow-2xl transition-all transform translate-y-16 opacity-0 pointer-events-none flex items-center gap-2.5 no-print font-display">
     <span class="text-base">✨</span>
     <span id="toastMsg">Action completed!</span>
   </div>

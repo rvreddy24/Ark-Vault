@@ -1,4 +1,4 @@
-// Ark Vault • Digital Edition • Clean Slate LocalStorage Engine with Dark Mode & Enhanced Typography
+// Ark Vault • Digital Edition • Robust & Polished LocalStorage Engine
 
 const STORAGE_KEY = 'ark_vault_data_clean_v3';
 const THEME_KEY = 'ark_theme';
@@ -125,7 +125,7 @@ const SAMPLE_VAULT_DATA = {
   }
 };
 
-// Sound Synthesizer
+// Sound Synthesizer with automatic user-gesture unlock
 class SoundController {
   constructor() {
     this.ctx = null;
@@ -147,7 +147,7 @@ class SoundController {
       const g = this.ctx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      g.gain.setValueAtTime(0.04, this.ctx.currentTime);
+      g.gain.setValueAtTime(0.035, this.ctx.currentTime);
       g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.12);
       osc.connect(g);
       g.connect(this.ctx.destination);
@@ -158,14 +158,21 @@ class SoundController {
 }
 const sound = new SoundController();
 
-// Toast Notification
+// Unlock audio on first interaction
+window.addEventListener('pointerdown', () => sound.init(), { once: true });
+window.addEventListener('keydown', () => sound.init(), { once: true });
+
+// Toast Notification with robust timeout management
 const toast = document.getElementById('toast');
 const toastMsg = document.getElementById('toastMsg');
+let toastTimeout = null;
+
 function showToast(msg) {
   sound.pop(640);
+  if (toastTimeout) clearTimeout(toastTimeout);
   toastMsg.innerText = msg;
   toast.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
-  setTimeout(() => {
+  toastTimeout = setTimeout(() => {
     toast.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
   }, 2200);
 }
@@ -270,7 +277,7 @@ function getBadgeColors(cat) {
   }
 }
 
-// Create dynamic card element with enhanced typography & animations
+// Create dynamic card element with enhanced typography & non-collapsing lines
 function createCardElement(cat, item, index = 0) {
   const colors = getBadgeColors(cat);
   const card = document.createElement('div');
@@ -281,7 +288,7 @@ function createCardElement(cat, item, index = 0) {
 
   const notesHtml = (item.notes || 'No extra notes recorded.')
     .split('\n')
-    .map(line => `<div>${escapeHtml(line)}</div>`)
+    .map(line => line.trim() ? `<div>${escapeHtml(line)}</div>` : `<div class="h-1.5"></div>`)
     .join('');
 
   card.innerHTML = `
@@ -290,21 +297,21 @@ function createCardElement(cat, item, index = 0) {
         <span class="px-2.5 py-1 rounded-full text-xs font-bold ${colors.bg} ${colors.text} border ${colors.border} font-mono uppercase tracking-wider">
           ${escapeHtml(item.badge || 'LIFELINE')}
         </span>
-        <button class="toggle-verify-btn text-sm font-bold ${item.verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} hover:opacity-80 transition-all flex items-center gap-1.5 font-display" title="Toggle verification status">
+        <button type="button" class="toggle-verify-btn text-xs sm:text-sm font-bold ${item.verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} hover:opacity-80 transition-all flex items-center gap-1.5 font-display" title="Toggle verification status">
           ${item.verified ? '✓ VERIFIED' : '⚪ UNVERIFIED'}
         </button>
       </div>
       <h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white font-display leading-snug">${escapeHtml(item.title)}</h3>
       <p class="text-xs md:text-sm font-mono font-medium text-slate-500 dark:text-slate-400 mt-1">${escapeHtml(item.ref || 'No identifier recorded')}</p>
-      <div class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs md:text-sm text-slate-700 dark:text-slate-300 space-y-1.5 font-sans leading-relaxed">
+      <div class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs md:text-sm text-slate-700 dark:text-slate-300 space-y-1 font-sans leading-relaxed">
         ${notesHtml}
       </div>
     </div>
     <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between no-print">
-      <button class="edit-btn text-xs md:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-display active:scale-95 transition-transform">
+      <button type="button" class="edit-btn text-xs md:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-display active:scale-95 transition-transform">
         ✏️ Edit
       </button>
-      <button class="delete-btn text-xs md:text-sm font-bold text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-display active:scale-95 transition-transform">
+      <button type="button" class="delete-btn text-xs md:text-sm font-bold text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-display active:scale-95 transition-transform">
         🗑️ Delete
       </button>
     </div>
@@ -354,7 +361,7 @@ function renderAll() {
           <h4 class="text-base md:text-lg font-black text-slate-800 dark:text-slate-200 font-display">${cfg.title}</h4>
           <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1.5 leading-relaxed">${cfg.desc}</p>
         </div>
-        <button class="add-cat-btn px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${cfg.btnColor} font-display active:scale-95 shadow-sm">
+        <button type="button" class="add-cat-btn px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${cfg.btnColor} font-display active:scale-95 shadow-sm">
           ➕ Add First ${cfg.badge}
         </button>
       `;
@@ -404,9 +411,16 @@ function calculateReadinessScore() {
   ];
 
   const total = allCards.length;
+  const gaugeBox = document.getElementById('scoreGaugeBox');
+  const readout = document.getElementById('scoreReadout');
+
   if (total === 0) {
     updateReadinessUI(0, 0, 0, "⚪ Status: Clean Slate", "0 Lifelines Added — Add your first record to begin");
     document.getElementById('heroSubtitle').innerText = "Your vault is completely private and saved in your local browser storage. Start by adding your first lifeline.";
+    
+    // Muted styling for 0%
+    gaugeBox.className = "flex items-center gap-4 bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300";
+    readout.className = "text-4xl md:text-5xl font-black font-mono tracking-tight text-slate-400 dark:text-slate-500 transition-colors";
     return;
   }
 
@@ -414,8 +428,19 @@ function calculateReadinessScore() {
   const percent = Math.round((verified / total) * 100);
 
   let statusLabel = "🟢 Status: Strong";
-  if (percent < 50) statusLabel = "🔴 Status: Vulnerable";
-  else if (percent < 80) statusLabel = "🟡 Status: In Progress";
+  if (percent < 50) {
+    statusLabel = "🔴 Status: Vulnerable";
+    gaugeBox.className = "flex items-center gap-4 bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300";
+    readout.className = "text-4xl md:text-5xl font-black font-mono tracking-tight text-rose-600 dark:text-rose-400 transition-colors";
+  } else if (percent < 80) {
+    statusLabel = "🟡 Status: In Progress";
+    gaugeBox.className = "flex items-center gap-4 bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300";
+    readout.className = "text-4xl md:text-5xl font-black font-mono tracking-tight text-amber-600 dark:text-amber-400 transition-colors";
+  } else {
+    statusLabel = "🟢 Status: Strong";
+    gaugeBox.className = "flex items-center gap-4 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 px-5 py-3 rounded-2xl shrink-0 shadow-sm transition-all duration-300";
+    readout.className = "text-4xl md:text-5xl font-black font-mono tracking-tight text-emerald-600 dark:text-emerald-400 transition-colors";
+  }
 
   document.getElementById('heroSubtitle').innerText = `${verified} of ${total} records currently verified. Export to USB or print your safe binder anytime.`;
   updateReadinessUI(percent, verified, total, statusLabel, `${verified} of ${total} Lifelines Verified`);
@@ -468,13 +493,23 @@ function openAddModal(preselectedCat = null, defaultBadge = null) {
   editRecordId.value = "";
   cardCat.disabled = false;
   if (preselectedCat) cardCat.value = preselectedCat;
-  cardBadge.value = defaultBadge || "";
+  cardBadge.value = defaultBadge || (EMPTY_STATE_CONFIG[cardCat.value] ? EMPTY_STATE_CONFIG[cardCat.value].badge : "");
   cardTitle.value = "";
   cardRef.value = "";
   cardNotes.value = "";
   deleteRecordModalBtn.classList.add('hidden');
   recordModal.classList.remove('hidden');
+
+  setTimeout(() => cardTitle.focus(), 60);
 }
+
+// When changing category in Add modal, auto-suggest badge if empty
+cardCat.addEventListener('change', () => {
+  if (!editRecordId.value) {
+    const cfg = EMPTY_STATE_CONFIG[cardCat.value];
+    if (cfg) cardBadge.value = cfg.badge;
+  }
+});
 
 function openEditModal(cat, id) {
   sound.pop(560);
@@ -491,6 +526,8 @@ function openEditModal(cat, id) {
   cardNotes.value = item.notes || "";
   deleteRecordModalBtn.classList.remove('hidden');
   recordModal.classList.remove('hidden');
+
+  setTimeout(() => cardTitle.focus(), 60);
 }
 
 function closeRecordModal() {
@@ -515,7 +552,7 @@ deleteRecordModalBtn.addEventListener('click', () => {
   }
 });
 
-document.getElementById('saveCardBtn').addEventListener('click', () => {
+function submitRecordForm() {
   const cat = cardCat.value;
   const id = editRecordId.value;
   const title = cardTitle.value.trim();
@@ -525,6 +562,7 @@ document.getElementById('saveCardBtn').addEventListener('click', () => {
 
   if (!title) {
     showToast('Please enter a title for this record');
+    cardTitle.focus();
     return;
   }
 
@@ -557,6 +595,18 @@ document.getElementById('saveCardBtn').addEventListener('click', () => {
   closeRecordModal();
 
   document.querySelector(`[data-tab="${cat}"]`)?.click();
+}
+
+document.getElementById('saveCardBtn').addEventListener('click', submitRecordForm);
+
+// Enter key submit in modal inputs
+[cardTitle, cardRef, cardBadge].forEach(input => {
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitRecordForm();
+    }
+  });
 });
 
 // Tab Switching & Clickable Hero Tiles
@@ -611,7 +661,10 @@ document.querySelectorAll('[data-nav-tab]').forEach(tile => {
     const target = tile.dataset.navTab;
     if (target) {
       switchTab(target);
-      window.scrollTo({ top: 320, behavior: 'smooth' });
+      const targetElem = document.querySelector(`[data-tab="${target}"]`);
+      if (targetElem) {
+        targetElem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
     }
   });
 });
@@ -674,6 +727,7 @@ editFamilyBtn.addEventListener('click', () => {
   sound.pop(520);
   familyNameInput.value = vaultState.familyName || "My Family Vault";
   familyNameModal.classList.remove('hidden');
+  setTimeout(() => familyNameInput.focus(), 60);
 });
 
 cancelFamilyBtn.addEventListener('click', () => familyNameModal.classList.add('hidden'));
@@ -681,7 +735,7 @@ familyNameModal.addEventListener('click', (e) => {
   if (e.target === familyNameModal) familyNameModal.classList.add('hidden');
 });
 
-saveFamilyBtn.addEventListener('click', () => {
+function submitFamilyName() {
   const val = familyNameInput.value.trim();
   if (val) {
     vaultState.familyName = val;
@@ -689,6 +743,14 @@ saveFamilyBtn.addEventListener('click', () => {
     renderAll();
     familyNameModal.classList.add('hidden');
     showToast(`Household name set to: ${val}`);
+  }
+}
+
+saveFamilyBtn.addEventListener('click', submitFamilyName);
+familyNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    submitFamilyName();
   }
 });
 
@@ -711,12 +773,13 @@ backupModal.addEventListener('click', (e) => {
   if (e.target === backupModal) backupModal.classList.add('hidden');
 });
 
-// Export JSON
+// Export JSON with local date stamp
 downloadBackupBtn.addEventListener('click', () => {
   sound.pop(640);
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(vaultState, null, 2));
   const downloadAnchor = document.createElement('a');
-  const dateStr = new Date().toISOString().split('T')[0];
   downloadAnchor.setAttribute("href", dataStr);
   downloadAnchor.setAttribute("download", `ark-family-vault-backup-${dateStr}.json`);
   document.body.appendChild(downloadAnchor);
@@ -778,6 +841,7 @@ clearToBlankBtn.addEventListener('click', () => {
     saveState();
     renderAll();
     templateModal.classList.add('hidden');
+    switchTab('urgent');
     showToast("Vault reset to clean blank state 🧹");
   }
 });
@@ -788,6 +852,7 @@ loadSampleDataBtn.addEventListener('click', () => {
     saveState();
     renderAll();
     templateModal.classList.add('hidden');
+    switchTab('urgent');
     showToast("Demo example records loaded! ✨");
   }
 });
