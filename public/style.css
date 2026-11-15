@@ -1,16 +1,26 @@
 /* Ark Vault Colorful & Scannable Design System */
 
 @media print {
-  body {
+  html, body, .dark, body.dark {
     background: white !important;
     color: black !important;
   }
-  header, footer, .tab-chip, #addCardBtn, #printBtn, #addModal, #toast {
+  header, footer, .tab-chip, #addCardBtn, #printBtn, #themeToggleBtn, #backupBtn, #templateMenuBtn, #recordModal, #toast, .no-print {
     display: none !important;
+  }
+  .print-only {
+    display: block !important;
   }
   .tab-content {
     display: block !important;
-    page-break-after: always;
+    page-break-after: auto;
+  }
+  .card-item {
+    break-inside: avoid;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
   }
 }
 
@@ -29,11 +39,19 @@
   border-radius: 9999px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-/* Tab Content Animation */
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Animations */
 .tab-content {
   animation: popIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -47,4 +65,19 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scaleUp {
+  animation: scaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

@@ -1,6 +1,7 @@
-// Ark Vault • Digital Edition • Clean Slate LocalStorage Engine
+// Ark Vault • Digital Edition • Clean Slate LocalStorage Engine with Dark Mode
 
 const STORAGE_KEY = 'ark_vault_data_clean_v3';
+const THEME_KEY = 'ark_theme';
 
 // Clean Blank Default Dataset (Zero Preloaded Data)
 const BLANK_VAULT_DATA = {
@@ -169,6 +170,38 @@ function showToast(msg) {
   }, 2200);
 }
 
+// ================= THEME MANAGER =================
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+const themeToggleIcon = document.getElementById('themeToggleIcon');
+
+function updateThemeUI(isDark) {
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+    themeToggleIcon.innerText = '☀️';
+    themeToggleBtn.title = "Switch to Light Mode";
+  } else {
+    document.documentElement.classList.remove('dark');
+    themeToggleIcon.innerText = '🌙';
+    themeToggleBtn.title = "Switch to Dark Mode";
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved === 'dark' || (!saved && systemDark);
+  updateThemeUI(isDark);
+}
+
+themeToggleBtn.addEventListener('click', () => {
+  sound.pop(720);
+  const isCurrentlyDark = document.documentElement.classList.contains('dark');
+  const newDark = !isCurrentlyDark;
+  localStorage.setItem(THEME_KEY, newDark ? 'dark' : 'light');
+  updateThemeUI(newDark);
+  showToast(newDark ? "Dark mode activated 🌙" : "Light mode activated ☀️");
+});
+
 // State Manager
 let vaultState = null;
 
@@ -178,7 +211,6 @@ function loadState() {
     if (raw) {
       vaultState = JSON.parse(raw);
     } else {
-      // Default to completely clean blank template
       vaultState = JSON.parse(JSON.stringify(BLANK_VAULT_DATA));
       saveState();
     }
@@ -203,38 +235,38 @@ const EMPTY_STATE_CONFIG = {
     title: "No First 24-Hour Lifelines Added",
     desc: "Add your primary next-of-kin contact, emergency cash reserve location, or employer HR benefits line.",
     badge: "CALL FIRST",
-    btnColor: "bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200"
+    btnColor: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800"
   },
   finance: {
     icon: "💳",
     title: "No Financial Lifelines Mapped",
     desc: "Record your term life insurance policies, mortgage draft dates, or master password vault location.",
     badge: "LIFE POLICY",
-    btnColor: "bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200"
+    btnColor: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800"
   },
   home: {
     icon: "🏡",
     title: "No Home Utility Specs Recorded",
     desc: "Document your main water shutoff valve, electrical breaker panel location, or HVAC filter dimensions.",
     badge: "WATER VALVE",
-    btnColor: "bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200"
+    btnColor: "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800"
   },
   parents: {
     icon: "👵",
     title: "No Aging Parent Records Added",
     desc: "Track elderly parents' Medicare IDs, cardiologists, active Power of Attorney, or fraud protection locks.",
     badge: "MEDICARE / DPOA",
-    btnColor: "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200"
+    btnColor: "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800"
   }
 };
 
 function getBadgeColors(cat) {
   switch (cat) {
-    case 'urgent': return { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' };
-    case 'finance': return { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' };
-    case 'home': return { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' };
-    case 'parents': return { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' };
-    default: return { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-200' };
+    case 'urgent': return { bg: 'bg-rose-50 dark:bg-rose-950/50', text: 'text-rose-700 dark:text-rose-300', border: 'border-rose-200 dark:border-rose-900/60' };
+    case 'finance': return { bg: 'bg-blue-50 dark:bg-blue-950/50', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-200 dark:border-blue-900/60' };
+    case 'home': return { bg: 'bg-amber-50 dark:bg-amber-950/50', text: 'text-amber-800 dark:text-amber-300', border: 'border-amber-200 dark:border-amber-900/60' };
+    case 'parents': return { bg: 'bg-purple-50 dark:bg-purple-950/50', text: 'text-purple-700 dark:text-purple-300', border: 'border-purple-200 dark:border-purple-900/60' };
+    default: return { bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-700 dark:text-slate-300', border: 'border-slate-200 dark:border-slate-700' };
   }
 }
 
@@ -242,7 +274,7 @@ function getBadgeColors(cat) {
 function createCardElement(cat, item) {
   const colors = getBadgeColors(cat);
   const card = document.createElement('div');
-  card.className = 'card-item bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3';
+  card.className = 'card-item bg-white dark:bg-[#101726] rounded-2xl border border-slate-200 dark:border-slate-800/90 p-4 shadow-sm hover:shadow-md dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-3';
   card.dataset.id = item.id;
   card.dataset.cat = cat;
 
@@ -257,21 +289,21 @@ function createCardElement(cat, item) {
         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${colors.bg} ${colors.text} border ${colors.border} font-mono uppercase tracking-wider">
           ${escapeHtml(item.badge || 'LIFELINE')}
         </span>
-        <button class="toggle-verify-btn text-xs font-bold ${item.verified ? 'text-emerald-600' : 'text-slate-400'} hover:opacity-80 transition-all flex items-center gap-1" title="Toggle verification status">
+        <button class="toggle-verify-btn text-xs font-bold ${item.verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} hover:opacity-80 transition-all flex items-center gap-1 font-display" title="Toggle verification status">
           ${item.verified ? '✓ VERIFIED' : '⚪ UNVERIFIED'}
         </button>
       </div>
-      <h3 class="text-sm font-black text-slate-900">${escapeHtml(item.title)}</h3>
-      <p class="text-xs font-mono font-medium text-slate-500 mt-0.5">${escapeHtml(item.ref || 'No identifier')}</p>
-      <div class="mt-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 space-y-1">
+      <h3 class="text-sm font-black text-slate-900 dark:text-white font-display">${escapeHtml(item.title)}</h3>
+      <p class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(item.ref || 'No identifier')}</p>
+      <div class="mt-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs text-slate-700 dark:text-slate-300 space-y-1 font-sans">
         ${notesHtml}
       </div>
     </div>
-    <div class="pt-2 border-t border-slate-100 flex items-center justify-between no-print">
-      <button class="edit-btn text-[11px] font-bold text-indigo-600 hover:text-indigo-800">
+    <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between no-print">
+      <button class="edit-btn text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-display">
         ✏️ Edit
       </button>
-      <button class="delete-btn text-[11px] font-bold text-rose-500 hover:text-rose-700">
+      <button class="delete-btn text-[11px] font-bold text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-display">
         🗑️ Delete
       </button>
     </div>
@@ -314,14 +346,14 @@ function renderAll() {
 
     if (items.length === 0) {
       const emptyDiv = document.createElement('div');
-      emptyDiv.className = 'col-span-full p-8 text-center bg-white/80 border-2 border-dashed border-slate-200 rounded-3xl space-y-3';
+      emptyDiv.className = 'col-span-full p-8 text-center bg-white/80 dark:bg-slate-900/60 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl space-y-3 transition-colors';
       emptyDiv.innerHTML = `
         <div class="text-3xl">${cfg.icon}</div>
         <div>
-          <h4 class="text-sm font-black text-slate-800">${cfg.title}</h4>
-          <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">${cfg.desc}</p>
+          <h4 class="text-sm font-black text-slate-800 dark:text-slate-200 font-display">${cfg.title}</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">${cfg.desc}</p>
         </div>
-        <button class="add-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition-all ${cfg.btnColor}">
+        <button class="add-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition-all ${cfg.btnColor} font-display">
           ➕ Add First ${cfg.badge}
         </button>
       `;
@@ -547,11 +579,11 @@ tabChips.forEach(chip => {
     sound.pop(480);
 
     tabChips.forEach(c => {
-      c.className = 'tab-chip px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/80 shadow-sm whitespace-nowrap transition-all';
+      c.className = 'tab-chip px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800 shadow-sm whitespace-nowrap transition-all font-display';
     });
 
     const color = chipColorMap[target] || chipColorMap.urgent;
-    chip.className = `tab-chip px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 ${color.bg} ${color.text} shadow-md ${color.shadow} whitespace-nowrap transition-all`;
+    chip.className = `tab-chip px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 ${color.bg} ${color.text} shadow-md ${color.shadow} whitespace-nowrap transition-all font-display`;
 
     Object.keys(tabPanels).forEach(k => {
       if (k === target) {
@@ -737,5 +769,6 @@ document.getElementById('printBtn').addEventListener('click', () => {
 });
 
 // Initial boot
+initTheme();
 loadState();
 renderAll();
